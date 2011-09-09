@@ -728,4 +728,5 @@ Y.namespace('Plugin').NodeAccordion = Y.Base.create("NodeAccordion", Y.Plugin.Ba
 });
 
 
-}, 'gallery-2011.03.02-20-58' ,{skinnable:true, optional:['anim'], requires:['node-base', 'node-style', 'plugin', 'base', 'node-event-delegate', 'classnamemanager']});
+
+}, '@VERSION@' ,{requires:['node-base', 'node-style', 'plugin', 'base', 'node-event-delegate', 'classnamemanager'], optional:['anim'], skinnable:true});

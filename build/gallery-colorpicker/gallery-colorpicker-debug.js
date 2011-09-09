@@ -1,3 +1,5 @@
+YUI.add('gallery-colorpicker', function(Y) {
+
 /**
 * <p>The Color Picker Widget provides a HTML5 based UI for selecting a color
 * from the HSL color space. It uses the Canvas element to render the dynamic
@@ -733,3 +735,7 @@ Y.extend(ColorPalette, Y.Widget, {
 	}
 });
 Y.ColorPalette = ColorPalette;
+
+
+
+}, '@VERSION@' ,{requires:['node', 'event', 'widget', 'event-mouseenter']});
