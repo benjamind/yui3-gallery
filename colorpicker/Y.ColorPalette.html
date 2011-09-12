@@ -1,0 +1,365 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<title>API: gallery-colorpicker  Y.ColorPalette   (YUI Library)</title>
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
+    <script type="text/javascript" src="assets/api-js"></script>
+    <script type="text/javascript" src="assets/ac-js"></script>
+</head>
+
+<body id="yahoo-com">
+
+<div id="doc3" class="yui-t2">
+	<div id="hd">
+        <h1><a href="http://developer.yahoo.com/yui/" title="Yahoo! UI Library">Yahoo! UI Library</a></h1>
+        <h3>gallery-colorpicker&nbsp; <span class="subtitle">1.0.0</span></h3>
+        <a href="./index.html" title="Yahoo! UI Library">Yahoo! UI Library</a> 
+            &gt; <a href="./module_gallery-colorpicker.html" title="gallery-colorpicker">gallery-colorpicker</a>
+                 &gt; Y.ColorPalette 
+                
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
+	</div>
+
+	<div id="bd">
+		<div id="yui-main">
+			<div class="yui-b">
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
+            </form>
+
+                    <h2>
+                        
+
+                        
+                        
+                            Class <b property="yui:name">Y.ColorPalette</b>
+                        <span class="extends">
+                        </span>
+
+                    </h2>
+                    <!-- class tree goes here -->
+                    
+                
+  
+
+                    <div class="summary description" property="yui:description">
+                        ColorPalette provides a simple interface for storing and reusing selected colors. It can be coupled with the ColorPicker widget to provide
+a simple history of selected colors.
+                    </div>
+
+                    
+                    <div rel="yui:properties" resource="#properties">
+                        <div class="section field details">
+                            <h3 id="properties">Properties</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:property" resource="#property_colors">
+                                    <h4><a name="property_colors" property="yui:name">colors</a>
+                                        - <code><span property="yui:type">Array</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            An array of colors stored in the palette
+                                        </div>
+                                    </div>
+     
+                                        
+                                    <div class="default" property="yui:defaultValue">
+                                        Default Value: []
+                                    </div>        
+
+
+                                    <hr />
+                                    </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div rel="yui:methods" resource="#methods">
+                        <div class="section method details">
+                            <h3 id="methods">Methods</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:method" resource="#method_addColor">
+                                    <h4>
+                                        <a name="method_addColor">addColor</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">addColor</strong>
+                                           (
+                                                
+                                                        
+                                                         color
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Adds the specified color to the palette if it doesn't already exist.
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">color</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the color to add, in HSL float object format e.g. <code>&#123; h: 1.0, s: 1.0, l: 0.5 &#125;</code></span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_colorExists">
+                                    <h4>
+                                        <a name="method_colorExists">colorExists</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        Boolean
+                                            <strong property="yui:name">colorExists</strong>
+                                           (
+                                                
+                                                        
+                                                         color
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Returns true if the specified color (in HSL float object format) already exists in the palette
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">color</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  the color to test, in HSL float object format e.g. <code>&#123; h: 1.0, s: 1.0, l: 0.5 &#125;</code></span>
+                                                        </dd>
+                                                </dl>
+
+                                                <dl>
+                                                    <dt>Returns:
+                                                    <code property="yui:return">
+                                                            Boolean
+                                                    </code></dt>
+                                                    <dd property="yui:returnInfo">true if the color already exists in the palette</dd>
+                                                </dl>
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="protected" rel="yui:method" resource="#method_onSwatchClick">
+                                    <h4>
+                                        <a name="method_onSwatchClick">onSwatchClick</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                         protected 
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">onSwatchClick</strong>
+                                           (
+                                                
+                                                        
+                                                         ev
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Handler for the moment when a swatch in the palette is clicked. This handler fires the 'palette:selected' event.
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">ev</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> the click event.</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div rel="yui:events" resource="#events">
+                        <div class="section method details">
+                            <h3 id="events">Events</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:event" resource="#event_palette:selected">
+                                    <h4>
+                                        <a name="event_palette:selected">palette:selected</a></h4>
+                                    <div class="detail">
+                                        <code>
+                                        
+                                        
+                                        
+                                            <strong property="yui:name">palette:selected</strong>
+
+                                            (
+                                                
+                                                        
+                                                         color
+                                                    
+                                                
+                                            )
+
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            An event fired when a color in the palette is clicked upon.
+                                        </div>
+
+                                        <div class="description">
+
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                            <code><span property="yui:name">color</span>
+                                                                &lt;<span property="yui:type">Object</span>&gt;
+                                                            </code>
+                                                            <span property="yui:description"> An object containing the color in RGB and HSL format e.g. <code>&#123; rgb: &#123; r: 255, g: 0, b: 0 &#125;, hsl: &#123; h: 1.0, s: 0.5, l: 1.0 &#125; &#125;</code></span>
+                                                        </dd>
+                                                        
+                                                </dl>
+
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div rel="yui:attributes" resource="#configattributes">
+
+                    </div>
+
+			</div>
+		</div>
+		<div class="yui-b">
+            <div class="nav">
+
+                    <div id="moduleList" class="module">
+                        <h4>Modules</h4>
+                        <ul class="content">
+                                <li class="selected"><a href="module_gallery-colorpicker.html" title="gallery-colorpicker">gallery-colorpicker</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="classList" class="module">
+                        <h4>Classes</h4>
+                        <ul class="content">
+                                <li class="selected"><a href="Y.ColorPalette.html" title="Y.ColorPalette">Y.ColorPalette</a></li>
+                                <li class=""><a href="Y.ColorPicker.html" title="Y.ColorPicker">Y.ColorPicker</a></li>
+                                <li class=""><a href="Y.Colors.html" title="Y.Colors">Y.Colors</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="fileList" class="module">
+                        <h4>Files</h4>
+                        <ul class="content">        
+                                <li class=""><a href="colorpicker.js.html" title="colorpicker.js">colorpicker.js</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="propertyList" class="module">
+                        <h4>Properties</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#property_colors" title="colors">colors</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="methodsList" class="module">
+                        <h4>Methods</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#method_addColor" title="addColor">addColor</a></li>
+                                <li class=""><a href="#method_colorExists" title="colorExists">colorExists</a></li>
+                                <li class="protected"><a href="#method_onSwatchClick" title="onSwatchClick">onSwatchClick</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="eventsList" class="module">
+                        <h4>Events</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#event_palette:selected" title="palette:selected">palette:selected</a></li>
+                        </ul>
+                    </div>
+
+
+            </div>
+		</div>
+	</div>
+	<div id="ft">
+        <hr />
+        Copyright &copy; 2011 Yahoo! Inc. All rights reserved.
+	</div>
+</div>
+<script type="text/javascript">
+
+    var ALL_YUI_PROPS = [{"url": "Y.ColorPalette.html#method_addColor", "access": "", "host": "Y.ColorPalette", "type": "method", "name": "addColor"}, {"url": "Y.ColorPicker.html#config_barHeight", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "barHeight"}, {"url": "Y.ColorPicker.html#property_barPaddingX", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "barPaddingX"}, {"url": "Y.ColorPicker.html#property_barPaddingY", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "barPaddingY"}, {"url": "Y.ColorPicker.html#config_barWidth", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "barWidth"}, {"url": "Y.ColorPicker.html#config_cacheBars", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "cacheBars"}, {"url": "Y.ColorPicker.html#property_color", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "color"}, {"url": "Y.ColorPalette.html#method_colorExists", "access": "", "host": "Y.ColorPalette", "type": "method", "name": "colorExists"}, {"url": "Y.ColorPalette.html#property_colors", "access": "", "host": "Y.ColorPalette", "type": "property", "name": "colors"}, {"url": "Y.ColorPicker.html#config_hex", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "hex"}, {"url": "Y.ColorPicker.html#config_hsl", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "hsl"}, {"url": "Y.ColorPicker.html#config_hslInt", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "hslInt"}, {"url": "Y.Colors.html#method_hslToRGB", "access": "", "host": "Y.Colors", "type": "method", "name": "hslToRGB"}, {"url": "Y.Colors.html#method__hue2rgb", "access": "protected", "host": "Y.Colors", "type": "method", "name": "_hue2rgb"}, {"url": "Y.ColorPicker.html#property_lCachePixels", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "lCachePixels"}, {"url": "Y.ColorPalette.html#method_onSwatchClick", "access": "protected", "host": "Y.ColorPalette", "type": "method", "name": "onSwatchClick"}, {"url": "Y.ColorPalette.html#event_palette:selected", "access": "", "host": "Y.ColorPalette", "type": "event", "name": "palette:selected"}, {"url": "Y.ColorPicker.html#config_rgb", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "rgb"}, {"url": "Y.Colors.html#method_rgbToHSL", "access": "", "host": "Y.Colors", "type": "method", "name": "rgbToHSL"}, {"url": "Y.ColorPicker.html#property_sCachePixels", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "sCachePixels"}, {"url": "Y.ColorPicker.html#config_showHEX", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "showHEX"}, {"url": "Y.ColorPicker.html#config_showHSL", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "showHSL"}, {"url": "Y.ColorPicker.html#config_showHSLBars", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "showHSLBars"}, {"url": "Y.ColorPicker.html#config_showRGB", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "showRGB"}, {"url": "Y.ColorPicker.html#config_showSwatch", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "showSwatch"}, {"url": "Y.ColorPicker.html#property_squareCachePixels", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "squareCachePixels"}, {"url": "Y.ColorPicker.html#config_squareHeight", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "squareHeight"}, {"url": "Y.ColorPicker.html#config_squareWidth", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "squareWidth"}, {"url": "Y.ColorPicker.html#config_strings", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "strings"}, {"url": "Y.ColorPicker.html#config_swatchHeight", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "swatchHeight"}, {"url": "Y.ColorPicker.html#config_swatchWidth", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "swatchWidth"}];
+</script>
+</body>
+</html>

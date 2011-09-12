@@ -1,0 +1,20 @@
+@charset "UTF-8";
+
+a:link, a:visited, a:active {
+	color:#93b528;
+	text-decoration:none;
+}
+a:hover {
+	color:#000;
+	text-decoration:underline;
+}
+.entry {
+	border:1px solid #dadada;
+	background:#fff;
+	margin:0 0 10px;
+	padding:10px;
+}
+body {
+	width: 640px;
+	margin: auto;
+}

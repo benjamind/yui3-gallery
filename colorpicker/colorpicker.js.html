@@ -1,0 +1,1072 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<title>API: gallery-colorpicker   colorpicker.js  (YUI Library)</title>
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
+    <script type="text/javascript" src="assets/api-js"></script>
+    <script type="text/javascript" src="assets/ac-js"></script>
+</head>
+
+<body id="yahoo-com">
+
+<div id="doc3" class="yui-t2">
+	<div id="hd">
+        <h1><a href="http://developer.yahoo.com/yui/" title="Yahoo! UI Library">Yahoo! UI Library</a></h1>
+        <h3>gallery-colorpicker&nbsp; <span class="subtitle">1.0.0</span></h3>
+        <a href="./index.html" title="Yahoo! UI Library">Yahoo! UI Library</a> 
+            &gt; <a href="./module_gallery-colorpicker.html" title="gallery-colorpicker">gallery-colorpicker</a>
+                
+                 &gt; colorpicker.js (source view) 
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
+	</div>
+
+	<div id="bd">
+		<div id="yui-main">
+			<div class="yui-b">
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
+            </form>
+
+                    <div id="srcout">
+                        <style>
+                            #doc3 .classopts { display:none; }
+                        </style>
+                        <div class="highlight"><pre><span class="cm">/**</span>
+<span class="cm">* &lt;p&gt;The Color Picker Widget provides a HTML5 based UI for selecting a color</span>
+<span class="cm">* from the HSL color space.&lt;/p&gt;</span>
+<span class="cm">* </span>
+<span class="cm">* &lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; ColorPicker uses the Canvas element to render the dynamic</span>
+<span class="cm">* color sliders, as such it &lt;strong&gt;requires HTML5 support&lt;/strong&gt;, so &lt;em&gt;Internet Explorer</span>
+<span class="cm">* versions prior to version 9 will not work with this widget&lt;/em&gt;.&lt;/p&gt;</span>
+<span class="cm">*</span>
+<span class="cm">* &lt;p&gt; To use the Color Picker Widget, simply add a reference to it in your</span>
+<span class="cm">* &lt;code&gt;use()&lt;/code&gt; statement, and then instantiate an instance of the widget</span>
+<span class="cm">* and render it to a node.&lt;/p&gt;</span>
+<span class="cm">*</span>
+<span class="cm">* &lt;p&gt;</span>
+<span class="cm">* &lt;code&gt;</span>
+<span class="cm">* &amp;#60;script type=&quot;text/javascript&quot;&amp;#63;&lt;br/&gt;</span>
+<span class="cm">*	// Call the &#39;use&#39; method passing in &quot;gallery-colorpicker&quot;. This will load&lt;br/&gt;</span>
+<span class="cm">*	// the script and CSS for the Color Picker Widget and all of the required&lt;br/&gt;</span>
+<span class="cm">*	// dependencies</span>
+<span class="cm">* &lt;br&gt;</span>
+<span class="cm">*	YUI().use(&quot;gallery-colorpicker&quot;, function (Y) { &lt;br/&gt;</span>
+<span class="cm">*		// create an instance of the widget &lt;br/&gt;</span>
+<span class="cm">*		var colorpicker = new Y.ColorPicker(); &lt;br/&gt;</span>
+<span class="cm">*		// render the widget into the #picker node&lt;br/&gt;</span>
+<span class="cm">*		colorpicker.render(&quot;#picker&quot;);&lt;br/&gt;</span>
+<span class="cm">*		Y.on(&#39;#getcolorbutton&#39;,function(ev) {&lt;br/&gt;</span>
+<span class="cm">*			ev.halt();&lt;br/&gt;</span>
+<span class="cm">*			var hex = colorpicker.get(&#39;hex&#39;);&lt;br/&gt;</span>
+<span class="cm">*			// do something with the hex value....&lt;br/&gt;</span>
+<span class="cm">*		});&lt;br/&gt;</span>
+<span class="cm">*	}</span>
+<span class="cm">* &lt;/code&gt;</span>
+<span class="cm">* &lt;/p&gt;</span>
+<span class="cm">* @module gallery-colorpicker</span>
+<span class="cm">* @requires node, event, widget, classnamemanager</span>
+<span class="cm">*/</span>
+
+<span class="cm">/**</span>
+<span class="cm">* The Colors class provides simple color conversion functionality. It currently</span>
+<span class="cm">* supports HSL to RGB conversions and vice versa. The conversion methods are</span>
+<span class="cm">* used directly, e.g. &lt;a href=&quot;Y.Colors.html#method_hslToRGB&quot;&gt;&lt;code&gt;</span>
+<span class="cm">* Y.Colors.hslToRGB(1.0,1.0,1.0);&lt;/code&gt;&lt;/a&gt;</span>
+<span class="cm">* @namespace Y</span>
+<span class="cm">* @class Colors</span>
+<span class="cm">*/</span>
+<span class="kd">var</span> <span class="nx">Colors</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="cm">/**</span>
+<span class="cm">	* Converts RGB values in the range 0-255 to HSL format in the range 0-1.</span>
+<span class="cm">	* @method rgbToHSL</span>
+<span class="cm">	* @param {Number} r red component of the color in the range 0-255</span>
+<span class="cm">	* @param {Number} g green component of the color in the range 0-255</span>
+<span class="cm">	* @param {Number} b blue component of the color in the range 0-255</span>
+<span class="cm">	* @public</span>
+<span class="cm">	* @return {object} the color in HSL format, returned as an object of the</span>
+<span class="cm">	* form &lt;code&gt;&amp;#123; h: 1.0, s: 0.5, l: 0.5 &amp;#125;&lt;/code&gt;. The HSL values are normalised in the</span>
+<span class="cm">	* range 0-1.</span>
+<span class="cm">	*/</span>
+	<span class="nx">rgbToHSL</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">r</span> <span class="o">/=</span> <span class="mi">255</span><span class="p">;</span> <span class="nx">g</span> <span class="o">/=</span> <span class="mi">255</span><span class="p">;</span> <span class="nx">b</span> <span class="o">/=</span> <span class="mi">255</span><span class="p">;</span>
+		<span class="kd">var</span> <span class="nx">max</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="nx">b</span><span class="p">),</span> <span class="nx">min</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="nx">b</span><span class="p">),</span>
+			<span class="nx">h</span><span class="p">,</span> <span class="nx">s</span><span class="p">,</span> <span class="nx">l</span> <span class="o">=</span> <span class="p">(</span><span class="nx">max</span> <span class="o">+</span> <span class="nx">min</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">d</span><span class="p">;</span>
+
+		<span class="k">if</span> <span class="p">(</span><span class="nx">max</span> <span class="o">===</span> <span class="nx">min</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">h</span> <span class="o">=</span> <span class="nx">s</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// achromatic</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+			<span class="nx">d</span> <span class="o">=</span> <span class="nx">max</span> <span class="o">-</span> <span class="nx">min</span><span class="p">;</span>
+			<span class="nx">s</span> <span class="o">=</span> <span class="nx">l</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="o">?</span> <span class="nx">d</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">-</span> <span class="nx">max</span> <span class="o">-</span> <span class="nx">min</span><span class="p">)</span> <span class="o">:</span> <span class="nx">d</span> <span class="o">/</span> <span class="p">(</span><span class="nx">max</span> <span class="o">+</span> <span class="nx">min</span><span class="p">);</span>
+			<span class="k">switch</span> <span class="p">(</span><span class="nx">max</span><span class="p">)</span> <span class="p">{</span>
+			<span class="k">case</span> <span class="nx">r</span><span class="o">:</span> <span class="nx">h</span> <span class="o">=</span> <span class="p">(</span><span class="nx">g</span> <span class="o">-</span> <span class="nx">b</span><span class="p">)</span> <span class="o">/</span> <span class="nx">d</span> <span class="o">+</span> <span class="p">(</span><span class="nx">g</span> <span class="o">&lt;</span> <span class="nx">b</span> <span class="o">?</span> <span class="mi">6</span> <span class="o">:</span> <span class="mi">0</span><span class="p">);</span> <span class="k">break</span><span class="p">;</span>
+			<span class="k">case</span> <span class="nx">g</span><span class="o">:</span> <span class="nx">h</span> <span class="o">=</span> <span class="p">(</span><span class="nx">b</span> <span class="o">-</span> <span class="nx">r</span><span class="p">)</span> <span class="o">/</span> <span class="nx">d</span> <span class="o">+</span> <span class="mi">2</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+			<span class="k">case</span> <span class="nx">b</span><span class="o">:</span> <span class="nx">h</span> <span class="o">=</span> <span class="p">(</span><span class="nx">r</span> <span class="o">-</span> <span class="nx">g</span><span class="p">)</span> <span class="o">/</span> <span class="nx">d</span> <span class="o">+</span> <span class="mi">4</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+			<span class="p">}</span>
+			<span class="nx">h</span> <span class="o">/=</span> <span class="mi">6</span><span class="p">;</span>
+		<span class="p">}</span>
+
+		<span class="k">return</span> <span class="p">{</span><span class="nx">h</span><span class="o">:</span> <span class="nx">h</span><span class="p">,</span> <span class="nx">s</span><span class="o">:</span> <span class="nx">s</span><span class="p">,</span> <span class="nx">l</span><span class="o">:</span> <span class="nx">l</span><span class="p">};</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	* Internal method used for converting for HSL to RGB.</span>
+<span class="cm">	* @method _hue2rgb</span>
+<span class="cm">	* @protected</span>
+<span class="cm">	*/</span>
+	<span class="nx">_hue2rgb</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">q</span><span class="p">,</span> <span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">t</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="nx">t</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span> <span class="p">}</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">t</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span> <span class="nx">t</span> <span class="o">-=</span> <span class="mi">1</span><span class="p">;</span> <span class="p">}</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">t</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">6</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">p</span> <span class="o">+</span> <span class="p">(</span><span class="nx">q</span> <span class="o">-</span> <span class="nx">p</span><span class="p">)</span> <span class="o">*</span> <span class="mi">6</span> <span class="o">*</span> <span class="nx">t</span><span class="p">;</span> <span class="p">}</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">t</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">q</span><span class="p">;</span> <span class="p">}</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">t</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">p</span> <span class="o">+</span> <span class="p">(</span><span class="nx">q</span> <span class="o">-</span> <span class="nx">p</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">-</span> <span class="nx">t</span><span class="p">)</span> <span class="o">*</span> <span class="mi">6</span><span class="p">;</span> <span class="p">}</span>
+		<span class="k">return</span> <span class="nx">p</span><span class="p">;</span>
+	<span class="p">},</span>
+	
+	<span class="cm">/**</span>
+<span class="cm">	* Converts HSL values in the range 0-1 to RGB format in the range 0-255.</span>
+<span class="cm">	* @method hslToRGB</span>
+<span class="cm">	* @param {Number} h hue component of the color in the range 0-1</span>
+<span class="cm">	* @param {Number} s saturation component of the color in the range 0-1</span>
+<span class="cm">	* @param {Number} l lightness component of the color in the range 0-1</span>
+<span class="cm">	* @public</span>
+<span class="cm">	* @return {object} the color in RGB format, returned as an object of the</span>
+<span class="cm">	* form &lt;code&gt;&amp;#123; r: 255, g: 0, b: 0 &amp;#125;&lt;/code&gt;. The RGB values are normalised in the</span>
+<span class="cm">	* range 0-255.</span>
+<span class="cm">	*/</span>
+	<span class="nx">hslToRGB</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">h</span><span class="p">,</span> <span class="nx">s</span><span class="p">,</span> <span class="nx">l</span><span class="p">)</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">q</span><span class="p">,</span> <span class="nx">p</span><span class="p">;</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">s</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">r</span> <span class="o">=</span> <span class="nx">g</span> <span class="o">=</span> <span class="nx">b</span> <span class="o">=</span> <span class="nx">l</span><span class="p">;</span> <span class="c1">// achromatic</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+
+			<span class="nx">q</span> <span class="o">=</span> <span class="nx">l</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="o">?</span> <span class="nx">l</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="nx">s</span><span class="p">)</span> <span class="o">:</span> <span class="nx">l</span> <span class="o">+</span> <span class="nx">s</span> <span class="o">-</span> <span class="nx">l</span> <span class="o">*</span> <span class="nx">s</span><span class="p">;</span>
+			<span class="nx">p</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">l</span> <span class="o">-</span> <span class="nx">q</span><span class="p">;</span>
+			<span class="nx">r</span> <span class="o">=</span> <span class="nx">Colors</span><span class="p">.</span><span class="nx">_hue2rgb</span><span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">q</span><span class="p">,</span> <span class="nx">h</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">);</span>
+			<span class="nx">g</span> <span class="o">=</span> <span class="nx">Colors</span><span class="p">.</span><span class="nx">_hue2rgb</span><span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">q</span><span class="p">,</span> <span class="nx">h</span><span class="p">);</span>
+			<span class="nx">b</span> <span class="o">=</span> <span class="nx">Colors</span><span class="p">.</span><span class="nx">_hue2rgb</span><span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">q</span><span class="p">,</span> <span class="nx">h</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">);</span>
+		<span class="p">}</span>
+
+		<span class="k">return</span> <span class="p">{</span><span class="nx">r</span><span class="o">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">r</span> <span class="o">*</span> <span class="mi">255</span><span class="p">),</span> <span class="nx">g</span><span class="o">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">g</span> <span class="o">*</span> <span class="mi">255</span><span class="p">),</span> <span class="nx">b</span><span class="o">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">b</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)};</span>
+	<span class="p">}</span>
+<span class="p">};</span>
+<span class="nx">Y</span><span class="p">.</span><span class="nx">Colors</span> <span class="o">=</span> <span class="nx">Colors</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm">* ColorPicker is a widget that provides a HTML5 based canvas interface to selecting colors</span>
+<span class="cm">* using the HSL format. It provides a thumb from which to select colors as well as sliders</span>
+<span class="cm">* and text areas for manually entering values.</span>
+<span class="cm">* </span>
+<span class="cm">* You can retrieve the currently selected color through a variety of properties, allowing</span>
+<span class="cm">* you to select colors in HSL, RGB and Hex formats.</span>
+<span class="cm">*</span>
+<span class="cm">* @namespace Y</span>
+<span class="cm">* @class ColorPicker</span>
+<span class="cm">*/</span>
+<span class="kd">function</span> <span class="nx">ColorPicker</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">superclass</span><span class="p">.</span><span class="nx">constructor</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">NAME</span> <span class="o">=</span> <span class="s1">&#39;colorpicker&#39;</span><span class="p">;</span>
+<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">ClassNameManager</span><span class="p">.</span><span class="nx">getClassName</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">NAME</span><span class="p">);</span>
+<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_SQUARE</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">ClassNameManager</span><span class="p">.</span><span class="nx">getClassName</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">NAME</span><span class="p">,</span><span class="s1">&#39;colrsqr&#39;</span><span class="p">);</span>
+<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_HBAR</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">ClassNameManager</span><span class="p">.</span><span class="nx">getClassName</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">NAME</span><span class="p">,</span><span class="s1">&#39;hbar&#39;</span><span class="p">);</span>
+<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_SBAR</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">ClassNameManager</span><span class="p">.</span><span class="nx">getClassName</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">NAME</span><span class="p">,</span><span class="s1">&#39;sbar&#39;</span><span class="p">);</span>
+<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_LBAR</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">ClassNameManager</span><span class="p">.</span><span class="nx">getClassName</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">NAME</span><span class="p">,</span><span class="s1">&#39;lbar&#39;</span><span class="p">);</span>
+<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_SWATCH</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">ClassNameManager</span><span class="p">.</span><span class="nx">getClassName</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">NAME</span><span class="p">,</span><span class="s1">&#39;swatch&#39;</span><span class="p">);</span>
+<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_VALUE</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">ClassNameManager</span><span class="p">.</span><span class="nx">getClassName</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">NAME</span><span class="p">,</span><span class="s1">&#39;val&#39;</span><span class="p">);</span>
+<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_HVALUE</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">ClassNameManager</span><span class="p">.</span><span class="nx">getClassName</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">NAME</span><span class="p">,</span><span class="s1">&#39;hval&#39;</span><span class="p">);</span>
+<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_SVALUE</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">ClassNameManager</span><span class="p">.</span><span class="nx">getClassName</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">NAME</span><span class="p">,</span><span class="s1">&#39;sval&#39;</span><span class="p">);</span>
+<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_LVALUE</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">ClassNameManager</span><span class="p">.</span><span class="nx">getClassName</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">NAME</span><span class="p">,</span><span class="s1">&#39;lval&#39;</span><span class="p">);</span>
+<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_RVALUE</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">ClassNameManager</span><span class="p">.</span><span class="nx">getClassName</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">NAME</span><span class="p">,</span><span class="s1">&#39;rval&#39;</span><span class="p">);</span>
+<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_GVALUE</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">ClassNameManager</span><span class="p">.</span><span class="nx">getClassName</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">NAME</span><span class="p">,</span><span class="s1">&#39;gval&#39;</span><span class="p">);</span>
+<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_BVALUE</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">ClassNameManager</span><span class="p">.</span><span class="nx">getClassName</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">NAME</span><span class="p">,</span><span class="s1">&#39;bval&#39;</span><span class="p">);</span>
+<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_HEXVALUE</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">ClassNameManager</span><span class="p">.</span><span class="nx">getClassName</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">NAME</span><span class="p">,</span><span class="s1">&#39;hexval&#39;</span><span class="p">);</span>
+
+<span class="c1">// Configuration attributes</span>
+<span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">ATTRS</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="cm">/**</span>
+<span class="cm">	* Controls visibility of the Hue, Saturation and Lightness color bars from which colors can be selected.</span>
+<span class="cm">	* @config showHSLBars</span>
+<span class="cm">	* @type Boolean</span>
+<span class="cm">	* @default true</span>
+<span class="cm">	*/</span>
+	<span class="nx">showHSLBars</span><span class="o">:</span> <span class="p">{</span>
+		<span class="nx">value</span><span class="o">:</span> <span class="kc">true</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	* Controls visibility of the Hue, Saturation and Lightness text boxes, allowing manual selection of specific values.</span>
+<span class="cm">	* @config showHSL</span>
+<span class="cm">	* @type Boolean</span>
+<span class="cm">	* @default true</span>
+<span class="cm">	*/</span>
+	<span class="nx">showHSL</span><span class="o">:</span> <span class="p">{</span>	
+		<span class="nx">value</span><span class="o">:</span> <span class="kc">true</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	* Controls visibility of the Red, Green and Blue text boxes, allowing manual selection of specific values.</span>
+<span class="cm">	* @config showRGB</span>
+<span class="cm">	* @type Boolean</span>
+<span class="cm">	* @default true</span>
+<span class="cm">	*/</span>
+	<span class="nx">showRGB</span><span class="o">:</span> <span class="p">{</span>
+		<span class="nx">value</span><span class="o">:</span> <span class="kc">true</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	* Controls visibility of the HEX text box.</span>
+<span class="cm">	* @config showHEX</span>
+<span class="cm">	* @type Boolean</span>
+<span class="cm">	* @default true</span>
+<span class="cm">	*/</span>
+	<span class="nx">showHEX</span><span class="o">:</span> <span class="p">{</span>
+		<span class="nx">value</span><span class="o">:</span> <span class="kc">true</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	* Controls visibility of the color swatch area which displays the current color.</span>
+<span class="cm">	* @config showSwatch</span>
+<span class="cm">	* @type Boolean</span>
+<span class="cm">	* @default true</span>
+<span class="cm">	*/</span>
+	<span class="nx">showSwatch</span><span class="o">:</span> <span class="p">{</span>
+		<span class="nx">value</span><span class="o">:</span> <span class="kc">true</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	* The width of the color selector area in pixels</span>
+<span class="cm">	* @config squareWidth</span>
+<span class="cm">	* @type Number</span>
+<span class="cm">	* @default 150</span>
+<span class="cm">	*/</span>
+	<span class="nx">squareWidth</span><span class="o">:</span> <span class="p">{</span>
+		<span class="nx">value</span><span class="o">:</span> <span class="mi">150</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	* The height of the color selector area in pixels</span>
+<span class="cm">	* @config squareHeight</span>
+<span class="cm">	* @type Number</span>
+<span class="cm">	* @default 150</span>
+<span class="cm">	*/</span>
+	<span class="nx">squareHeight</span><span class="o">:</span> <span class="p">{</span>
+		<span class="nx">value</span><span class="o">:</span> <span class="mi">150</span>
+	<span class="p">},</span>
+	
+	<span class="cm">/**</span>
+<span class="cm">	* The width of the color bars in pixels</span>
+<span class="cm">	* @config barWidth</span>
+<span class="cm">	* @type Number</span>
+<span class="cm">	* @default 20</span>
+<span class="cm">	*/</span>
+	<span class="nx">barWidth</span><span class="o">:</span> <span class="p">{</span>
+		<span class="nx">value</span><span class="o">:</span> <span class="mi">20</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	* The height of the color bars in pixels</span>
+<span class="cm">	* @config barHeight</span>
+<span class="cm">	* @type Number</span>
+<span class="cm">	* @default 150</span>
+<span class="cm">	*/</span>
+	<span class="nx">barHeight</span><span class="o">:</span> <span class="p">{</span>
+		<span class="nx">value</span><span class="o">:</span> <span class="mi">150</span>
+	<span class="p">},</span>
+	
+	<span class="cm">/**</span>
+<span class="cm">	* The width of the color swatch in pixels</span>
+<span class="cm">	* @config swatchWidth</span>
+<span class="cm">	* @type Number</span>
+<span class="cm">	* @default 110</span>
+<span class="cm">	*/</span>
+	<span class="nx">swatchWidth</span><span class="o">:</span> <span class="p">{</span>
+		<span class="nx">value</span><span class="o">:</span> <span class="mi">110</span>
+	<span class="p">},</span>
+	
+	<span class="cm">/**</span>
+<span class="cm">	* The height of the color swatch in pixels</span>
+<span class="cm">	* @config swatchHeight</span>
+<span class="cm">	* @type Number</span>
+<span class="cm">	* @default 34</span>
+<span class="cm">	*/</span>
+	<span class="nx">swatchHeight</span><span class="o">:</span> <span class="p">{</span>
+		<span class="nx">value</span><span class="o">:</span> <span class="mi">34</span>
+	<span class="p">},</span>
+	
+	<span class="cm">/**</span>
+<span class="cm">	* Gets or sets the selected color of the picker using HEX notation, e.g. &lt;code&gt;FFFFFF&lt;/code&gt;</span>
+<span class="cm">	* @config hex</span>
+<span class="cm">	* @type String</span>
+<span class="cm">	* @default &#39;FF0000&#39;</span>
+<span class="cm">	*/</span>
+	<span class="nx">hex</span><span class="o">:</span> <span class="p">{</span>
+		<span class="nx">getter</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+			<span class="kd">var</span> <span class="nx">rgb</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;rgb&#39;</span><span class="p">),</span>
+				<span class="nx">r</span> <span class="o">=</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">r</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span>
+				<span class="nx">g</span> <span class="o">=</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">g</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span>
+				<span class="nx">b</span> <span class="o">=</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">b</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="mi">16</span><span class="p">);</span>
+			<span class="k">if</span> <span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+				<span class="nx">r</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span> <span class="o">+</span> <span class="nx">r</span><span class="p">;</span>
+			<span class="p">}</span>
+			<span class="k">if</span> <span class="p">(</span><span class="nx">g</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+				<span class="nx">g</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span> <span class="o">+</span> <span class="nx">g</span><span class="p">;</span>
+			<span class="p">}</span>
+			<span class="k">if</span> <span class="p">(</span><span class="nx">b</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+				<span class="nx">b</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+			<span class="p">}</span>
+			<span class="k">return</span> <span class="nx">r</span> <span class="o">+</span> <span class="nx">g</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+		<span class="p">},</span>
+		<span class="nx">setter</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
+			<span class="c1">// convert hex string back to rgb, then use set(&#39;rgb&#39;, val);</span>
+			<span class="k">if</span> <span class="p">(</span><span class="nx">val</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">)</span> <span class="p">{</span>
+				<span class="k">return</span><span class="p">;</span>
+			<span class="p">}</span>
+			<span class="kd">var</span> <span class="nx">rComp</span> <span class="o">=</span> <span class="nx">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nx">val</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+				<span class="nx">gComp</span> <span class="o">=</span> <span class="nx">val</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="nx">val</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+				<span class="nx">bComp</span> <span class="o">=</span> <span class="nx">val</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="nx">val</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span>
+				<span class="nx">r</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">rComp</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
+				<span class="nx">g</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">gComp</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
+				<span class="nx">b</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">bComp</span><span class="p">,</span> <span class="mi">16</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;rgb&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">r</span><span class="o">:</span> <span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="o">:</span> <span class="nx">g</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="nx">b</span><span class="p">});</span>
+		<span class="p">}</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	* Gets or sets the selected color of the picker using RGB object notation, &lt;code&gt;{ r: 255, g: 0, b: 255 }&lt;/code&gt;</span>
+<span class="cm">	* @config rgb</span>
+<span class="cm">	* @type Object</span>
+<span class="cm">	* @default {r: 255, g: 0, b: 0}</span>
+<span class="cm">	*/</span>
+	<span class="nx">rgb</span><span class="o">:</span> <span class="p">{</span>
+		<span class="nx">getter</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">Colors</span><span class="p">.</span><span class="nx">hslToRGB</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">s</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">l</span><span class="p">);</span> <span class="p">},</span>
+		<span class="nx">setter</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">val</span><span class="p">.</span><span class="nx">r</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">val</span><span class="p">.</span><span class="nx">r</span><span class="p">,</span> <span class="mi">255</span><span class="p">);</span>
+			<span class="nx">val</span><span class="p">.</span><span class="nx">g</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">val</span><span class="p">.</span><span class="nx">g</span><span class="p">,</span> <span class="mi">255</span><span class="p">);</span>
+			<span class="nx">val</span><span class="p">.</span><span class="nx">b</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">val</span><span class="p">.</span><span class="nx">b</span><span class="p">,</span> <span class="mi">255</span><span class="p">);</span>
+			
+			<span class="nx">val</span><span class="p">.</span><span class="nx">r</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">val</span><span class="p">.</span><span class="nx">r</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+			<span class="nx">val</span><span class="p">.</span><span class="nx">g</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">val</span><span class="p">.</span><span class="nx">g</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+			<span class="nx">val</span><span class="p">.</span><span class="nx">b</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">val</span><span class="p">.</span><span class="nx">b</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+			<span class="c1">// set the internal hsl value from the rgb values given</span>
+			<span class="kd">var</span> <span class="nx">hsl</span> <span class="o">=</span> <span class="nx">Colors</span><span class="p">.</span><span class="nx">rgbToHSL</span><span class="p">(</span><span class="nx">val</span><span class="p">.</span><span class="nx">r</span><span class="p">,</span> <span class="nx">val</span><span class="p">.</span><span class="nx">g</span><span class="p">,</span> <span class="nx">val</span><span class="p">.</span><span class="nx">b</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">color</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">merge</span><span class="p">(</span><span class="nx">hsl</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">update</span><span class="p">();</span>
+		<span class="p">}</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	* Gets or sets the selected color of the picker using HSL integer object notation, &lt;code&gt;{ h: 360, s: 0, l: 100 }&lt;/code&gt;.</span>
+<span class="cm">	* Hue is represented in the range 0 - 360, saturation and lightness are in the range 0 - 100.</span>
+<span class="cm">	* @config hslInt</span>
+<span class="cm">	* @type Object</span>
+<span class="cm">	* @default {h: 0, s: 100, l: 50}</span>
+<span class="cm">	*/</span>
+	<span class="nx">hslInt</span><span class="o">:</span> <span class="p">{</span>
+		<span class="nx">getter</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+			<span class="kd">var</span> <span class="nx">hsl</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">merge</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">);</span>
+			<span class="nx">hsl</span><span class="p">.</span><span class="nx">h</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">hsl</span><span class="p">.</span><span class="nx">h</span> <span class="o">*</span> <span class="mi">360</span><span class="p">);</span>
+			<span class="nx">hsl</span><span class="p">.</span><span class="nx">s</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">hsl</span><span class="p">.</span><span class="nx">s</span> <span class="o">*</span> <span class="mi">100</span><span class="p">);</span>
+			<span class="nx">hsl</span><span class="p">.</span><span class="nx">l</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">hsl</span><span class="p">.</span><span class="nx">l</span> <span class="o">*</span> <span class="mi">100</span><span class="p">);</span>
+			<span class="k">return</span> <span class="nx">hsl</span><span class="p">;</span>
+		<span class="p">},</span>
+		<span class="nx">setter</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
+			<span class="kd">var</span> <span class="nx">hsl</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">merge</span><span class="p">(</span><span class="nx">val</span><span class="p">);</span>
+			<span class="nx">hsl</span><span class="p">.</span><span class="nx">h</span> <span class="o">=</span> <span class="nx">hsl</span><span class="p">.</span><span class="nx">h</span> <span class="o">/</span> <span class="mi">360</span><span class="p">;</span>
+			<span class="nx">hsl</span><span class="p">.</span><span class="nx">s</span> <span class="o">=</span> <span class="nx">hsl</span><span class="p">.</span><span class="nx">s</span> <span class="o">/</span> <span class="mi">100</span><span class="p">;</span>
+			<span class="nx">hsl</span><span class="p">.</span><span class="nx">l</span> <span class="o">=</span> <span class="nx">hsl</span><span class="p">.</span><span class="nx">l</span> <span class="o">/</span> <span class="mi">100</span><span class="p">;</span>
+			<span class="nx">hsl</span><span class="p">.</span><span class="nx">h</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">hsl</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
+			<span class="nx">hsl</span><span class="p">.</span><span class="nx">s</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">hsl</span><span class="p">.</span><span class="nx">s</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
+			<span class="nx">hsl</span><span class="p">.</span><span class="nx">l</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">hsl</span><span class="p">.</span><span class="nx">l</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
+			<span class="nx">hsl</span><span class="p">.</span><span class="nx">h</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">hsl</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">);</span>
+			<span class="nx">hsl</span><span class="p">.</span><span class="nx">s</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">hsl</span><span class="p">.</span><span class="nx">s</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">);</span>
+			<span class="nx">hsl</span><span class="p">.</span><span class="nx">l</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">hsl</span><span class="p">.</span><span class="nx">l</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">color</span> <span class="o">=</span> <span class="nx">hsl</span><span class="p">;</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">update</span><span class="p">();</span>
+		<span class="p">}</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	* Gets or sets the selected color of the picker using HSL floating point object notation, &lt;code&gt;{ h: 1.0, s: 0, l: 1.0 }&lt;/code&gt;.</span>
+<span class="cm">	* All values are normalized in the range 0 - 1.</span>
+<span class="cm">	* @config hsl</span>
+<span class="cm">	* @type Object</span>
+<span class="cm">	* @default {h: 0, s: 1, l: 0.5}</span>
+<span class="cm">	*/</span>
+	<span class="nx">hsl</span><span class="o">:</span> <span class="p">{</span>
+		<span class="nx">getter</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">;</span> <span class="p">},</span>
+		<span class="nx">setter</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">val</span><span class="p">.</span><span class="nx">h</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">val</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
+			<span class="nx">val</span><span class="p">.</span><span class="nx">s</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">val</span><span class="p">.</span><span class="nx">s</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
+			<span class="nx">val</span><span class="p">.</span><span class="nx">l</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">val</span><span class="p">.</span><span class="nx">l</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
+			<span class="nx">val</span><span class="p">.</span><span class="nx">h</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">val</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">);</span>
+			<span class="nx">val</span><span class="p">.</span><span class="nx">s</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">val</span><span class="p">.</span><span class="nx">s</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">);</span>
+			<span class="nx">val</span><span class="p">.</span><span class="nx">l</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">val</span><span class="p">.</span><span class="nx">l</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">color</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">merge</span><span class="p">(</span><span class="nx">val</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">update</span><span class="p">();</span>
+		<span class="p">}</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	* Controls if the color bars should be cached in memory. New color bars are generated as the Hue and Saturation values change,</span>
+<span class="cm">	* these generated images will be saved in memory if cacheBars is enabled. This may marginally increase performance at the</span>
+<span class="cm">	* cost of memory usage. Disabled by default.</span>
+<span class="cm">	* @config cacheBars</span>
+<span class="cm">	* @type Boolean</span>
+<span class="cm">	* @default false</span>
+<span class="cm">	*/</span>
+	<span class="nx">cacheBars</span><span class="o">:</span> <span class="p">{</span>
+		<span class="nx">value</span><span class="o">:</span> <span class="kc">false</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	* Sets the strings used for the labels on the text boxes, the available properties are &lt;code&gt;&#39;hValue&#39;, &#39;sValue&#39;, &#39;lValue&#39;,</span>
+<span class="cm">	* &#39;rValue&#39;, &#39;gValue&#39;, &#39;bValue&#39;, &#39;hexValue&#39;&lt;/code&gt;.</span>
+<span class="cm">	* @config strings</span>
+<span class="cm">	* @type Object</span>
+<span class="cm">	* @default { hValue: &#39;H&#39;, sValue: &#39;S&#39;, lValue: &#39;L&#39;, rValue: &#39;R&#39;, gValue: &#39;G&#39;, bValue: &#39;B&#39;, hexValue: &#39;Hex&#39; }</span>
+<span class="cm">	*/</span>
+	<span class="nx">strings</span><span class="o">:</span> <span class="p">{</span>
+		<span class="nx">value</span><span class="o">:</span> <span class="p">{</span>
+			<span class="nx">hValue</span><span class="o">:</span> <span class="s1">&#39;H&#39;</span><span class="p">,</span>
+			<span class="nx">sValue</span><span class="o">:</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span>
+			<span class="nx">lValue</span><span class="o">:</span> <span class="s1">&#39;L&#39;</span><span class="p">,</span>
+			<span class="nx">rValue</span><span class="o">:</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span>
+			<span class="nx">gValue</span><span class="o">:</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span>
+			<span class="nx">bValue</span><span class="o">:</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span>
+			<span class="nx">hexValue</span><span class="o">:</span> <span class="s1">&#39;Hex&#39;</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">};</span>
+
+<span class="nx">Y</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">,</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">Widget</span><span class="p">,</span> <span class="p">{</span>
+	<span class="cm">/**</span>
+<span class="cm">	* The current color selected by the picker in HSL object format.</span>
+<span class="cm">	* @property color</span>
+<span class="cm">	* @protected</span>
+<span class="cm">	* @type Object</span>
+<span class="cm">	* @default {h: 0, s: 1.0, l: 0.5}</span>
+<span class="cm">	*/</span>
+	<span class="nx">color</span><span class="o">:</span> <span class="p">{</span><span class="nx">h</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">s</span><span class="o">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="nx">l</span><span class="o">:</span> <span class="mf">0.5</span><span class="p">},</span>
+	
+	<span class="cm">/**</span>
+<span class="cm">	* An in-memory cache of the saturation bar images. Only used if cacheBars is enabled.</span>
+<span class="cm">	* @property sCachePixels</span>
+<span class="cm">	* @protected</span>
+<span class="cm">	* @type Object</span>
+<span class="cm">	*/</span>
+	<span class="nx">sCachePixels</span><span class="o">:</span> <span class="p">{},</span>
+	
+	<span class="cm">/**</span>
+<span class="cm">	* An in-memory cache of the lightness bar images. Only used if cacheBars is enabled.</span>
+<span class="cm">	* @property lCachePixels</span>
+<span class="cm">	* @protected</span>
+<span class="cm">	* @type Object</span>
+<span class="cm">	*/</span>
+	<span class="nx">lCachePixels</span><span class="o">:</span> <span class="p">{},</span>
+	
+	<span class="cm">/**</span>
+<span class="cm">	* An in-memory cache of the color selector area. Only used if cacheBars is enabled.</span>
+<span class="cm">	* @property squareCachePixels</span>
+<span class="cm">	* @protected</span>
+<span class="cm">	* @type Object</span>
+<span class="cm">	*/</span>
+	<span class="nx">squareCachePixels</span><span class="o">:</span> <span class="p">{},</span>
+	
+	<span class="cm">/**</span>
+<span class="cm">	* Horizontal padding between color bars.</span>
+<span class="cm">	* @property barPaddingX</span>
+<span class="cm">	* @protected</span>
+<span class="cm">	* @type Number</span>
+<span class="cm">	* @default 5</span>
+<span class="cm">	*/</span>
+	<span class="nx">barPaddingX</span><span class="o">:</span> <span class="mi">5</span><span class="p">,</span>
+	
+	<span class="cm">/**</span>
+<span class="cm">	* Vertical padding between color bars.</span>
+<span class="cm">	* @property barPaddingY</span>
+<span class="cm">	* @protected</span>
+<span class="cm">	* @type Number</span>
+<span class="cm">	* @default 5</span>
+<span class="cm">	*/</span>
+	<span class="nx">barPaddingY</span><span class="o">:</span> <span class="mi">5</span><span class="p">,</span>
+	
+	<span class="nx">renderUI</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">contentBox</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;contentBox&#39;</span><span class="p">);</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">contentBox</span><span class="p">.</span><span class="nx">addClass</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+		
+		<span class="k">this</span><span class="p">.</span><span class="nx">squareCanvas</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">createCanvas</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_SQUARE</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;squareWidth&#39;</span><span class="p">),</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;squareHeight&#39;</span><span class="p">));</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">squareCanvas</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="s2">&quot;squareCanvas&quot;</span><span class="p">;</span>
+		<span class="c1">// render the current saturation level to the square canvas, iterating of H and L</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">renderSquare</span><span class="p">();</span>
+		
+		<span class="kd">var</span> <span class="nx">barWidth</span><span class="p">,</span> <span class="nx">barHeight</span><span class="p">,</span> <span class="nx">rgbColor</span><span class="p">,</span> <span class="nx">hexColor</span><span class="p">;</span>
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;showHSLBars&#39;</span><span class="p">))</span> <span class="p">{</span>
+			<span class="nx">barWidth</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;barWidth&#39;</span><span class="p">);</span>
+			<span class="nx">barHeight</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;barHeight&#39;</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">hCanvas</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">createCanvas</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_HBAR</span><span class="p">,</span> <span class="nx">barWidth</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">barHeight</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingY</span> <span class="o">*</span> <span class="mi">2</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">sCanvas</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">createCanvas</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_SBAR</span><span class="p">,</span> <span class="nx">barWidth</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">barHeight</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingY</span> <span class="o">*</span> <span class="mi">2</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">lCanvas</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">createCanvas</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_LBAR</span><span class="p">,</span> <span class="nx">barWidth</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">barHeight</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingY</span> <span class="o">*</span> <span class="mi">2</span><span class="p">);</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;showSwatch&#39;</span><span class="p">))</span> <span class="p">{</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">swatchCanvas</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">Node</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="s2">&quot;&lt;div&gt;&lt;/div&gt;&quot;</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">swatchCanvas</span><span class="p">.</span><span class="nx">addClass</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_SWATCH</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">contentBox</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">swatchCanvas</span><span class="p">);</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;showHSL&#39;</span><span class="p">))</span> <span class="p">{</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">hVal</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">createValue</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_HVALUE</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;strings.hValue&#39;</span><span class="p">),</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;hslInt&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">sVal</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">createValue</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_SVALUE</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;strings.sValue&#39;</span><span class="p">),</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">s</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;hslInt&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">lVal</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">createValue</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_LVALUE</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;strings.lValue&#39;</span><span class="p">),</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">l</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;hslInt&#39;</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">);</span>
+		<span class="p">}</span>
+		
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;showRGB&#39;</span><span class="p">))</span> <span class="p">{</span>
+			<span class="nx">rgbColor</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;rgb&#39;</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">rVal</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">createValue</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_RVALUE</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;strings.rValue&#39;</span><span class="p">),</span> <span class="nx">rgbColor</span><span class="p">.</span><span class="nx">r</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;rgb&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">gVal</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">createValue</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_GVALUE</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;strings.gValue&#39;</span><span class="p">),</span> <span class="nx">rgbColor</span><span class="p">.</span><span class="nx">g</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;rgb&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">bVal</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">createValue</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_BVALUE</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;strings.bValue&#39;</span><span class="p">),</span> <span class="nx">rgbColor</span><span class="p">.</span><span class="nx">b</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;rgb&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">);</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;showHEX&#39;</span><span class="p">))</span> <span class="p">{</span>				
+			<span class="nx">hexColor</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;hex&#39;</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">hexVal</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">createValue</span><span class="p">(</span><span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_HEXVALUE</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;strings.hexValue&#39;</span><span class="p">),</span> <span class="nx">hexColor</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;hex&#39;</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+		<span class="p">}</span>
+	<span class="p">},</span>
+	<span class="nx">renderPixels</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">canvas</span><span class="p">,</span> <span class="nx">width</span><span class="p">,</span> <span class="nx">height</span><span class="p">,</span> <span class="nx">paddingX</span><span class="p">,</span> <span class="nx">paddingY</span><span class="p">,</span> <span class="nx">fixedComponent</span><span class="p">,</span> <span class="nx">fixedValue</span><span class="p">,</span> <span class="nx">componentX</span><span class="p">,</span> <span class="nx">componentY</span><span class="p">,</span> <span class="nx">startX</span><span class="p">,</span> <span class="nx">startY</span><span class="p">,</span> <span class="nx">maxX</span><span class="p">,</span> <span class="nx">maxY</span><span class="p">,</span> <span class="nx">reverse</span><span class="p">)</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">ctx</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">),</span>
+			<span class="c1">// create some imagedata to draw into</span>
+			<span class="nx">pixels</span> <span class="o">=</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">createImageData</span><span class="p">(</span><span class="nx">width</span><span class="p">,</span> <span class="nx">height</span><span class="p">),</span>
+			<span class="c1">// loop over the canvas modifying appropriate component between start and range values</span>
+			<span class="c1">// figure out the starting positions</span>
+			<span class="nx">hsl</span> <span class="o">=</span> <span class="p">{</span><span class="nx">h</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">s</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">l</span><span class="o">:</span> <span class="mi">0</span><span class="p">},</span>
+			<span class="nx">componentXInc</span> <span class="o">=</span> <span class="p">(</span><span class="nx">maxX</span> <span class="o">-</span> <span class="nx">startX</span><span class="p">)</span> <span class="o">/</span> <span class="nx">width</span><span class="p">,</span>
+			<span class="nx">componentYInc</span> <span class="o">=</span> <span class="p">(</span><span class="nx">maxY</span> <span class="o">-</span> <span class="nx">startY</span><span class="p">)</span> <span class="o">/</span> <span class="nx">height</span><span class="p">,</span>
+			<span class="nx">idx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+			<span class="nx">idxInc</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+			<span class="nx">x</span><span class="p">,</span>
+			<span class="nx">y</span><span class="p">,</span>
+			<span class="nx">rgb</span><span class="p">;</span>
+			
+		<span class="nx">hsl</span><span class="p">[</span><span class="nx">fixedComponent</span><span class="p">]</span> <span class="o">=</span> <span class="nx">fixedValue</span><span class="p">;</span>
+		<span class="nx">hsl</span><span class="p">[</span><span class="nx">componentX</span><span class="p">]</span> <span class="o">=</span> <span class="nx">startX</span><span class="p">;</span>
+		<span class="nx">hsl</span><span class="p">[</span><span class="nx">componentY</span><span class="p">]</span> <span class="o">=</span> <span class="nx">startY</span><span class="p">;</span>
+		
+		<span class="k">if</span> <span class="p">(</span><span class="nx">reverse</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">idxInc</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+			<span class="nx">idx</span> <span class="o">=</span> <span class="nx">pixels</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="k">for</span> <span class="p">(</span><span class="nx">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">y</span> <span class="o">&lt;</span> <span class="nx">height</span><span class="p">;</span> <span class="nx">y</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+			<span class="k">for</span> <span class="p">(</span><span class="nx">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">x</span> <span class="o">&lt;</span> <span class="nx">width</span><span class="p">;</span> <span class="nx">x</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+				<span class="nx">rgb</span> <span class="o">=</span> <span class="nx">Colors</span><span class="p">.</span><span class="nx">hslToRGB</span><span class="p">(</span><span class="nx">hsl</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="nx">hsl</span><span class="p">.</span><span class="nx">s</span><span class="p">,</span> <span class="nx">hsl</span><span class="p">.</span><span class="nx">l</span><span class="p">);</span>
+				<span class="c1">//var rgb = {r:255, g:255, b:255};</span>
+				<span class="nx">pixels</span><span class="p">.</span><span class="nx">data</span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span> <span class="o">=</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">r</span><span class="p">;</span>
+				<span class="nx">idx</span> <span class="o">+=</span> <span class="nx">idxInc</span><span class="p">;</span>
+				<span class="nx">pixels</span><span class="p">.</span><span class="nx">data</span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span> <span class="o">=</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">g</span><span class="p">;</span>
+				<span class="nx">idx</span> <span class="o">+=</span> <span class="nx">idxInc</span><span class="p">;</span>
+				<span class="nx">pixels</span><span class="p">.</span><span class="nx">data</span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span> <span class="o">=</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">b</span><span class="p">;</span>
+				<span class="nx">idx</span> <span class="o">+=</span> <span class="nx">idxInc</span><span class="p">;</span>
+				<span class="nx">pixels</span><span class="p">.</span><span class="nx">data</span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">255</span><span class="p">;</span>
+				<span class="nx">idx</span> <span class="o">+=</span> <span class="nx">idxInc</span><span class="p">;</span>
+				<span class="nx">hsl</span><span class="p">[</span><span class="nx">componentX</span><span class="p">]</span> <span class="o">+=</span> <span class="nx">componentXInc</span><span class="p">;</span>
+			<span class="p">}</span>
+			<span class="nx">hsl</span><span class="p">[</span><span class="nx">componentY</span><span class="p">]</span> <span class="o">+=</span> <span class="nx">componentYInc</span><span class="p">;</span>
+			<span class="nx">hsl</span><span class="p">[</span><span class="nx">componentX</span><span class="p">]</span> <span class="o">=</span> <span class="nx">startX</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">putImageData</span><span class="p">(</span><span class="nx">pixels</span><span class="p">,</span> <span class="nx">paddingX</span><span class="p">,</span> <span class="nx">paddingY</span><span class="p">);</span>
+		<span class="k">return</span> <span class="nx">pixels</span><span class="p">;</span>
+	<span class="p">},</span> 
+	<span class="nx">startUpdating</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">stopUpdating</span><span class="p">();</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">moveListener</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;mousemove&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onMouseMove</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;boundingBox&#39;</span><span class="p">),</span> <span class="k">this</span><span class="p">);</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">mouseUpListener</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;mouseup&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onMouseUp</span><span class="p">,</span> <span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">animTimer</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">later</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">update</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+	<span class="p">},</span> 
+	<span class="nx">stopUpdating</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">animTimer</span><span class="p">)</span> <span class="p">{</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">animTimer</span><span class="p">.</span><span class="nx">cancel</span><span class="p">();</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">animTimer</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">moveListener</span><span class="p">)</span> <span class="p">{</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">moveListener</span><span class="p">.</span><span class="nx">detach</span><span class="p">();</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">moveListener</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">mouseUpListener</span><span class="p">)</span> <span class="p">{</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">mouseUpListener</span><span class="p">.</span><span class="nx">detach</span><span class="p">();</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">mouseUpListener</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+		<span class="p">}</span>
+	<span class="p">},</span> 
+	<span class="nx">onBarMouseDown</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ev</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">trackBar</span> <span class="o">=</span> <span class="nx">args</span><span class="p">.</span><span class="nx">component</span><span class="p">;</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">trackBarCanvas</span> <span class="o">=</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">target</span><span class="p">;</span>
+		<span class="kd">var</span> <span class="nx">offXY</span> <span class="o">=</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">getXY</span><span class="p">(),</span>
+			<span class="c1">// get position within the square</span>
+			<span class="nx">x</span> <span class="o">=</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">clientX</span> <span class="o">-</span> <span class="nx">offXY</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+			<span class="nx">y</span> <span class="o">=</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">clientY</span> <span class="o">-</span> <span class="nx">offXY</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+			
+		<span class="k">this</span><span class="p">.</span><span class="nx">barX</span> <span class="o">=</span> <span class="nx">x</span><span class="p">;</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">barY</span> <span class="o">=</span> <span class="nx">y</span><span class="p">;</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">startUpdating</span><span class="p">();</span>
+		<span class="nx">ev</span><span class="p">.</span><span class="nx">halt</span><span class="p">();</span>
+	<span class="p">},</span>
+	<span class="nx">onMouseUp</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ev</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">trackBar</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">trackSquare</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">stopUpdating</span><span class="p">();</span>
+		<span class="nx">ev</span><span class="p">.</span><span class="nx">halt</span><span class="p">();</span>
+	<span class="p">},</span>
+	<span class="nx">onMouseMove</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ev</span><span class="p">)</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">offXY</span><span class="p">,</span>
+			<span class="nx">x</span><span class="p">,</span>
+			<span class="nx">y</span><span class="p">,</span>
+			<span class="nx">width</span><span class="p">,</span>
+			<span class="nx">height</span><span class="p">;</span>
+			
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">trackSquare</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">offXY</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">Node</span><span class="p">.</span><span class="nx">one</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">squareCanvas</span><span class="p">).</span><span class="nx">getXY</span><span class="p">();</span>
+			<span class="c1">// get position within the square</span>
+			<span class="nx">x</span> <span class="o">=</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">clientX</span> <span class="o">-</span> <span class="nx">offXY</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+			<span class="nx">y</span> <span class="o">=</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">clientY</span> <span class="o">-</span> <span class="nx">offXY</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+			<span class="nx">width</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;squareWidth&#39;</span><span class="p">);</span>
+			<span class="nx">height</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;squareHeight&#39;</span><span class="p">);</span>
+				
+			<span class="nx">x</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">width</span><span class="p">,</span> <span class="nx">x</span><span class="p">);</span>
+			<span class="nx">y</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">height</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
+			<span class="nx">y</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
+			<span class="nx">x</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">x</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">squareX</span> <span class="o">=</span> <span class="nx">x</span><span class="p">;</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">squareY</span> <span class="o">=</span> <span class="nx">y</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">trackBar</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">offXY</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">trackBarCanvas</span><span class="p">.</span><span class="nx">getXY</span><span class="p">();</span>
+			<span class="c1">// get position within the square</span>
+			<span class="nx">x</span> <span class="o">=</span> <span class="o">-</span><span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span> <span class="o">+</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">clientX</span> <span class="o">-</span> <span class="nx">offXY</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+			<span class="nx">y</span> <span class="o">=</span> <span class="o">-</span><span class="k">this</span><span class="p">.</span><span class="nx">barPaddingY</span> <span class="o">+</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">clientY</span> <span class="o">-</span> <span class="nx">offXY</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+			<span class="nx">width</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;barWidth&#39;</span><span class="p">);</span>
+			<span class="nx">height</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;barHeight&#39;</span><span class="p">);</span>
+				
+			<span class="nx">x</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">width</span><span class="p">,</span> <span class="nx">x</span><span class="p">);</span>
+			<span class="nx">y</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">height</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
+			<span class="nx">y</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
+			<span class="nx">x</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">x</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">barX</span> <span class="o">=</span> <span class="nx">x</span><span class="p">;</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">barY</span> <span class="o">=</span> <span class="nx">y</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="nx">ev</span><span class="p">.</span><span class="nx">halt</span><span class="p">();</span>
+	<span class="p">},</span>
+	<span class="nx">onSquareMouseDown</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ev</span><span class="p">)</span> <span class="p">{</span>
+		<span class="c1">// mousedown inside square, start tracking position</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">trackSquare</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+		<span class="kd">var</span> <span class="nx">offXY</span> <span class="o">=</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">getXY</span><span class="p">(),</span>
+			<span class="c1">// get position within the square</span>
+			<span class="nx">x</span> <span class="o">=</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">clientX</span> <span class="o">-</span> <span class="nx">offXY</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+			<span class="nx">y</span> <span class="o">=</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">clientY</span> <span class="o">-</span> <span class="nx">offXY</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+			
+		<span class="k">this</span><span class="p">.</span><span class="nx">squareX</span> <span class="o">=</span> <span class="nx">x</span><span class="p">;</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">squareY</span> <span class="o">=</span> <span class="nx">y</span><span class="p">;</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">startUpdating</span><span class="p">();</span>
+		<span class="nx">ev</span><span class="p">.</span><span class="nx">halt</span><span class="p">();</span>
+	<span class="p">},</span>
+	<span class="nx">updateColor</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">barWidth</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;barWidth&#39;</span><span class="p">),</span>
+			<span class="nx">barHeight</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;barHeight&#39;</span><span class="p">),</span>
+			<span class="nx">cacheBars</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;cacheBars&#39;</span><span class="p">),</span>
+			<span class="nx">ctx</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hCanvas</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">);</span>
+			
+		<span class="c1">// clear the bars			</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">clearRect</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">barWidth</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">barHeight</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingY</span> <span class="o">*</span> <span class="mi">2</span><span class="p">);</span>
+		<span class="nx">ctx</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">sCanvas</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">);</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">clearRect</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">barWidth</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">barHeight</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingY</span> <span class="o">*</span> <span class="mi">2</span><span class="p">);</span>
+		<span class="nx">ctx</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">lCanvas</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">);</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">clearRect</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">barWidth</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">barHeight</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingY</span> <span class="o">*</span> <span class="mi">2</span><span class="p">);</span>
+		
+		<span class="k">if</span> <span class="p">(</span><span class="nx">cacheBars</span><span class="p">)</span> <span class="p">{</span>
+			<span class="c1">// render bars using cached pixel arrays if possible (uses more memory)</span>
+			<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">sCachePixels</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span><span class="p">])</span> <span class="p">{</span>
+				<span class="k">this</span><span class="p">.</span><span class="nx">sCachePixels</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span><span class="p">]</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">renderPixels</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">sCanvas</span><span class="p">,</span> <span class="nx">barWidth</span><span class="p">,</span> <span class="nx">barHeight</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingY</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+			<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+				<span class="nx">ctx</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">sCanvas</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">);</span>
+				<span class="nx">ctx</span><span class="p">.</span><span class="nx">putImageData</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">sCachePixels</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span><span class="p">],</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingY</span><span class="p">);</span>
+			<span class="p">}</span>
+			<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">lCachePixels</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span><span class="p">])</span> <span class="p">{</span>
+				<span class="k">this</span><span class="p">.</span><span class="nx">lCachePixels</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span><span class="p">]</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">renderPixels</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">lCanvas</span><span class="p">,</span> <span class="nx">barWidth</span><span class="p">,</span> <span class="nx">barHeight</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingY</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+			<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+				<span class="nx">ctx</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">lCanvas</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">);</span>
+				<span class="nx">ctx</span><span class="p">.</span><span class="nx">putImageData</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">lCachePixels</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span><span class="p">],</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingY</span><span class="p">);</span>
+			<span class="p">}</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">renderPixels</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">sCanvas</span><span class="p">,</span> <span class="nx">barWidth</span><span class="p">,</span> <span class="nx">barHeight</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingY</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">renderPixels</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">lCanvas</span><span class="p">,</span> <span class="nx">barWidth</span><span class="p">,</span> <span class="nx">barHeight</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingY</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">huePixelCache</span><span class="p">)</span> <span class="p">{</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">huePixelCache</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">renderPixels</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">hCanvas</span><span class="p">,</span> <span class="nx">barWidth</span><span class="p">,</span> <span class="nx">barHeight</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingY</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+			<span class="nx">ctx</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hCanvas</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">);</span>
+			<span class="nx">ctx</span><span class="p">.</span><span class="nx">putImageData</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">huePixelCache</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingY</span><span class="p">);</span>
+		<span class="p">}</span>
+		<span class="c1">// now draw on the pointers</span>
+	<span class="p">},</span>
+	<span class="nx">drawThumb</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">canvas</span><span class="p">,</span> <span class="nx">component</span><span class="p">,</span> <span class="nx">baseColor</span><span class="p">,</span> <span class="nx">width</span><span class="p">,</span> <span class="nx">height</span><span class="p">,</span> <span class="nx">max</span><span class="p">,</span> <span class="nx">reverse</span><span class="p">)</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">[</span><span class="nx">component</span><span class="p">],</span>
+			<span class="c1">// render the thumb to the canvas</span>
+			<span class="nx">ctx</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">),</span>
+			<span class="c1">// calculate position of thumb within bar</span>
+			<span class="nx">y</span> <span class="o">=</span> <span class="p">(</span><span class="nx">height</span> <span class="o">/</span> <span class="nx">max</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="nx">value</span><span class="p">),</span>
+			<span class="nx">col</span> <span class="o">=</span> <span class="nx">baseColor</span><span class="p">,</span>
+			<span class="nx">rgb</span><span class="p">;</span>
+			
+		<span class="k">if</span> <span class="p">(</span><span class="nx">reverse</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">y</span> <span class="o">=</span> <span class="nx">height</span> <span class="o">-</span> <span class="nx">y</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="nx">y</span> <span class="o">+=</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingY</span><span class="p">;</span>
+		<span class="c1">// calculate colour under thumb</span>
+		<span class="nx">col</span><span class="p">[</span><span class="nx">component</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+		<span class="c1">// invert color</span>
+		<span class="nx">col</span><span class="p">.</span><span class="nx">h</span> <span class="o">=</span> <span class="nx">col</span><span class="p">.</span><span class="nx">h</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">;</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">h</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">col</span><span class="p">.</span><span class="nx">h</span> <span class="o">+=</span> <span class="mf">1.0</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="nx">col</span><span class="p">.</span><span class="nx">s</span> <span class="o">=</span> <span class="nx">col</span><span class="p">.</span><span class="nx">s</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">;</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">s</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">col</span><span class="p">.</span><span class="nx">s</span> <span class="o">+=</span> <span class="mf">1.0</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="nx">col</span><span class="p">.</span><span class="nx">l</span> <span class="o">=</span> <span class="nx">col</span><span class="p">.</span><span class="nx">l</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">;</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">l</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">col</span><span class="p">.</span><span class="nx">l</span> <span class="o">+=</span> <span class="mf">1.0</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="c1">// now draw a line in that colour at y</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">();</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="nx">width</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
+		<span class="nx">rgb</span> <span class="o">=</span> <span class="nx">Colors</span><span class="p">.</span><span class="nx">hslToRGB</span><span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="nx">col</span><span class="p">.</span><span class="nx">s</span><span class="p">,</span> <span class="nx">col</span><span class="p">.</span><span class="nx">l</span><span class="p">);</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">strokeStyle</span> <span class="o">=</span> <span class="s2">&quot;rgb(&quot;</span> <span class="o">+</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">r</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">g</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">b</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">;</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">lineWidth</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">;</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">stroke</span><span class="p">();</span>
+		
+		<span class="c1">// draw the triangles</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">();</span>
+		
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">y</span> <span class="o">-</span> <span class="mf">2.5</span><span class="p">);</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">y</span> <span class="o">+</span> <span class="mf">2.5</span><span class="p">);</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
+		
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="nx">width</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="nx">width</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">y</span> <span class="o">-</span> <span class="mf">2.5</span><span class="p">);</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="nx">width</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">y</span> <span class="o">+</span> <span class="mf">2.5</span><span class="p">);</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="nx">width</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">barPaddingX</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
+		
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">strokeStyle</span> <span class="o">=</span> <span class="s2">&quot;rgb(255, 255, 255)&quot;</span><span class="p">;</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">fillStyle</span> <span class="o">=</span> <span class="s2">&quot;rgb(255, 255, 255)&quot;</span><span class="p">;</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">stroke</span><span class="p">();</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">fill</span><span class="p">();</span>
+	<span class="p">},</span>
+	<span class="nx">updateValues</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+		<span class="c1">// update each of the input boxes</span>
+		<span class="kd">var</span> <span class="nx">rgb</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;rgb&#39;</span><span class="p">),</span> <span class="nx">hexColor</span><span class="p">;</span>
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;showSwatch&#39;</span><span class="p">))</span> <span class="p">{</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">swatchCanvas</span><span class="p">.</span><span class="nx">setStyle</span><span class="p">(</span><span class="s1">&#39;background&#39;</span><span class="p">,</span> <span class="s1">&#39;rgb(&#39;</span> <span class="o">+</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">r</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">g</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">b</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">);</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;showHSL&#39;</span><span class="p">))</span> <span class="p">{</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">hVal</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span> <span class="o">*</span> <span class="mi">360</span><span class="p">));</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">sVal</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">s</span> <span class="o">*</span> <span class="mi">100</span><span class="p">));</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">lVal</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">l</span> <span class="o">*</span> <span class="mi">100</span><span class="p">));</span>
+		<span class="p">}</span>
+		
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;showRGB&#39;</span><span class="p">))</span> <span class="p">{</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">rVal</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">r</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">gVal</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">g</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">bVal</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">b</span><span class="p">);</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;showHEX&#39;</span><span class="p">))</span> <span class="p">{</span>				
+			<span class="nx">hexColor</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;hex&#39;</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">hexVal</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="nx">hexColor</span><span class="p">);</span>
+		<span class="p">}</span>
+	<span class="p">},</span>
+	<span class="nx">update</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">width</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;squareWidth&#39;</span><span class="p">),</span> <span class="nx">height</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;squareHeight&#39;</span><span class="p">),</span>
+			<span class="nx">barWidth</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;barWidth&#39;</span><span class="p">),</span> <span class="nx">barHeight</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;barHeight&#39;</span><span class="p">),</span>
+			<span class="nx">h</span><span class="p">,</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">v</span><span class="p">;</span>
+		<span class="c1">// calculate hue from position</span>
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">trackSquare</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">h</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="nx">width</span><span class="p">)</span> <span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">squareX</span><span class="p">;</span>
+			<span class="nx">l</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="nx">height</span><span class="p">)</span> <span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">squareY</span><span class="p">;</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span> <span class="o">=</span> <span class="nx">h</span><span class="p">;</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">l</span> <span class="o">=</span> <span class="nx">l</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">trackBar</span><span class="p">)</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">trackBar</span> <span class="o">===</span> <span class="s1">&#39;h&#39;</span><span class="p">)</span> <span class="p">{</span>
+				<span class="nx">h</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="nx">barHeight</span><span class="p">)</span> <span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">barY</span><span class="p">;</span>
+				<span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span> <span class="o">=</span> <span class="nx">h</span><span class="p">;</span>
+			<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+				<span class="nx">v</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="nx">barHeight</span><span class="p">)</span> <span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">barY</span><span class="p">;</span>
+				<span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">trackBar</span><span class="p">]</span> <span class="o">=</span> <span class="nx">v</span><span class="p">;</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">renderSquare</span><span class="p">();</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">updateColor</span><span class="p">();</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">updateValues</span><span class="p">();</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">drawThumb</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">hCanvas</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">h</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="nx">s</span><span class="o">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="nx">l</span><span class="o">:</span> <span class="mf">0.5</span><span class="p">},</span> <span class="nx">barWidth</span><span class="p">,</span> <span class="nx">barHeight</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">drawThumb</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">sCanvas</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">h</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="nx">s</span><span class="o">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="nx">l</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">l</span><span class="p">},</span> <span class="nx">barWidth</span><span class="p">,</span> <span class="nx">barHeight</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">drawThumb</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">lCanvas</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">h</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="nx">s</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">s</span><span class="p">,</span> <span class="nx">l</span><span class="o">:</span> <span class="mf">0.5</span><span class="p">},</span> <span class="nx">barWidth</span><span class="p">,</span> <span class="nx">barHeight</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+	<span class="p">},</span>
+	<span class="nx">renderSquare</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">width</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;squareWidth&#39;</span><span class="p">),</span> <span class="nx">height</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;squareHeight&#39;</span><span class="p">),</span>
+			<span class="nx">ctx</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">squareCanvas</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">),</span> <span class="nx">radius</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">;</span>
+		<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">squareCachePixels</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">s</span><span class="p">])</span> <span class="p">{</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">squareCachePixels</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">s</span><span class="p">]</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">renderPixels</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">squareCanvas</span><span class="p">,</span> <span class="nx">width</span><span class="p">,</span> <span class="nx">height</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">s</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+			<span class="nx">ctx</span><span class="p">.</span><span class="nx">putImageData</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">squareCachePixels</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">s</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+		<span class="p">}</span>
+		<span class="c1">// draw circle around selected hue/lightness</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">strokeStyle</span> <span class="o">=</span> <span class="s1">&#39;rgb(255, 255, 255)&#39;</span><span class="p">;</span>
+		<span class="nx">radius</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+		<span class="nx">x</span> <span class="o">=</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span> <span class="o">*</span> <span class="p">(</span><span class="nx">width</span><span class="o">/</span><span class="mf">1.0</span><span class="p">));</span>
+		<span class="nx">y</span> <span class="o">=</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">l</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="nx">height</span><span class="o">/</span><span class="mf">1.0</span><span class="p">));</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">();</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">arc</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">radius</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">stroke</span><span class="p">();</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">();</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">strokeStyle</span> <span class="o">=</span> <span class="s1">&#39;rgb(0, 0, 0)&#39;</span><span class="p">;</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">arc</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">radius</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+		<span class="nx">ctx</span><span class="p">.</span><span class="nx">stroke</span><span class="p">();</span>
+	<span class="p">},</span>
+	<span class="nx">createCanvas</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">className</span><span class="p">,</span> <span class="nx">width</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">div</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">Node</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="s2">&quot;&lt;div class=&#39;&quot;</span> <span class="o">+</span> <span class="nx">className</span> <span class="o">+</span> <span class="s2">&quot;&#39;&gt;&lt;/div&gt;&quot;</span><span class="p">),</span>
+			<span class="nx">canvas</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">Node</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="s2">&quot;&lt;canvas width=&#39;&quot;</span> <span class="o">+</span> <span class="nx">width</span> <span class="o">+</span> <span class="s2">&quot;&#39; height=&#39;&quot;</span> <span class="o">+</span> <span class="nx">height</span> <span class="o">+</span> <span class="s2">&quot;&#39;&gt;&lt;/canvas&gt;&quot;</span><span class="p">);</span>
+		<span class="nx">div</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">canvas</span><span class="p">);</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">contentBox</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">div</span><span class="p">);</span>
+		<span class="k">return</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">Node</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">(</span><span class="nx">canvas</span><span class="p">);</span>
+	<span class="p">},</span>
+	
+	<span class="nx">createValue</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">className</span><span class="p">,</span> <span class="nx">label</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">size</span><span class="p">,</span> <span class="nx">maxLength</span><span class="p">,</span> <span class="nx">target</span><span class="p">,</span> <span class="nx">component</span><span class="p">)</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">div</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">Node</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="s2">&quot;&lt;div class=&#39;&quot;</span> <span class="o">+</span> <span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_VALUE</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nx">className</span> <span class="o">+</span> <span class="s2">&quot;&#39;&gt;&lt;/div&gt;&quot;</span><span class="p">),</span>
+			<span class="nx">input</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">Node</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="s2">&quot;&lt;input type=&#39;text&#39; size=&#39;&quot;</span> <span class="o">+</span> <span class="nx">size</span> <span class="o">+</span> <span class="s2">&quot;&#39; maxlength=&#39;&quot;</span> <span class="o">+</span> <span class="nx">maxLength</span> <span class="o">+</span> <span class="s2">&quot;&#39; value=&#39;&quot;</span> <span class="o">+</span> <span class="nx">value</span> <span class="o">+</span> <span class="s2">&quot;&#39;&gt;&lt;/input&gt;&quot;</span><span class="p">);</span>
+			
+		<span class="nx">label</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">Node</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="s2">&quot;&lt;label&gt;&quot;</span> <span class="o">+</span> <span class="nx">label</span> <span class="o">+</span> <span class="s2">&quot;&lt;/label&gt;&quot;</span><span class="p">);</span>
+		<span class="nx">div</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">label</span><span class="p">);</span>
+		<span class="nx">label</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">contentBox</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">div</span><span class="p">);</span>
+		<span class="nx">input</span><span class="p">.</span><span class="nx">setData</span><span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="nx">target</span><span class="p">);</span>
+		<span class="nx">input</span><span class="p">.</span><span class="nx">setData</span><span class="p">(</span><span class="s1">&#39;component&#39;</span><span class="p">,</span> <span class="nx">component</span><span class="p">);</span>
+		<span class="k">return</span> <span class="nx">input</span><span class="p">;</span>
+	<span class="p">},</span>
+	<span class="nx">onInputKeyDown</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ev</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">ev</span><span class="p">.</span><span class="nx">charCode</span> <span class="o">===</span> <span class="mi">13</span> <span class="o">||</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">charCode</span> <span class="o">===</span> <span class="mi">8</span> <span class="o">||</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">charCode</span> <span class="o">===</span> <span class="mi">127</span> <span class="o">||</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">charCode</span> <span class="o">===</span> <span class="mi">9</span><span class="p">)</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="kd">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="nb">String</span><span class="p">.</span><span class="nx">fromCharCode</span><span class="p">(</span><span class="nx">ev</span><span class="p">.</span><span class="nx">charCode</span><span class="p">),</span>
+			<span class="nx">input</span> <span class="o">=</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">target</span><span class="p">,</span>
+			<span class="nx">target</span> <span class="o">=</span> <span class="nx">input</span><span class="p">.</span><span class="nx">getData</span><span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">),</span>
+			<span class="nx">regex</span><span class="p">;</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">target</span> <span class="o">===</span> <span class="s1">&#39;hex&#39;</span><span class="p">)</span> <span class="p">{</span>
+			<span class="c1">// allow 0-9a-f</span>
+			<span class="nx">regex</span> <span class="o">=</span> <span class="sr">/[0-9]|[a-f]|[A-F]/</span><span class="p">;</span>
+			<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">regex</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">key</span><span class="p">))</span> <span class="p">{</span>
+				<span class="nx">ev</span><span class="p">.</span><span class="nx">halt</span><span class="p">();</span>
+				<span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+			<span class="p">}</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+			<span class="c1">// only allow 0-9</span>
+			<span class="nx">regex</span> <span class="o">=</span> <span class="sr">/[0-9]/</span><span class="p">;</span>
+			<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">regex</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">key</span><span class="p">))</span> <span class="p">{</span>
+				<span class="nx">ev</span><span class="p">.</span><span class="nx">halt</span><span class="p">();</span>
+				<span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+	<span class="p">},</span>
+	<span class="nx">onInputKeyUp</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ev</span><span class="p">)</span> <span class="p">{</span>
+		<span class="c1">// filter out everything except numbers</span>
+		<span class="c1">// update RGB values </span>
+		<span class="c1">// filter it out</span>
+		<span class="c1">// use data in target object</span>
+		<span class="kd">var</span> <span class="nx">input</span> <span class="o">=</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">target</span><span class="p">,</span>
+			<span class="nx">target</span> <span class="o">=</span> <span class="nx">input</span><span class="p">.</span><span class="nx">getData</span><span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">),</span>
+			<span class="nx">component</span> <span class="o">=</span> <span class="nx">input</span><span class="p">.</span><span class="nx">getData</span><span class="p">(</span><span class="s1">&#39;component&#39;</span><span class="p">),</span>
+		
+			<span class="nx">inputValue</span> <span class="o">=</span> <span class="nx">input</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">),</span>
+			<span class="nx">value</span><span class="p">;</span>
+			
+		<span class="k">if</span> <span class="p">(</span><span class="nx">inputValue</span> <span class="o">===</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">{</span>
+			<span class="k">return</span><span class="p">;</span>
+		<span class="p">}</span>
+		
+		<span class="k">if</span> <span class="p">(</span><span class="nx">target</span> <span class="o">===</span> <span class="s1">&#39;hex&#39;</span><span class="p">)</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="p">(</span><span class="nx">inputValue</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">)</span> <span class="p">{</span>
+				<span class="k">return</span><span class="p">;</span>
+			<span class="p">}</span>
+			<span class="c1">// special case, just update the value</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">target</span><span class="p">,</span> <span class="nx">inputValue</span><span class="p">);</span>
+			<span class="k">return</span><span class="p">;</span>
+		<span class="p">}</span>
+		
+		<span class="c1">// get current value using the target</span>
+		<span class="nx">value</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">target</span><span class="p">);</span>
+		<span class="nx">value</span><span class="p">[</span><span class="nx">component</span><span class="p">]</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">inputValue</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+		
+		<span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">target</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
+	<span class="p">},</span>
+	<span class="nx">onInputBlur</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">update</span><span class="p">();</span>
+	<span class="p">},</span>
+	<span class="nx">bindUI</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+		<span class="nx">Y</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;mousedown&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onSquareMouseDown</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">squareCanvas</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+		<span class="nx">Y</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;mousedown&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onBarMouseDown</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">hCanvas</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="p">{</span><span class="nx">component</span><span class="o">:</span> <span class="s1">&#39;h&#39;</span><span class="p">});</span>
+		<span class="nx">Y</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;mousedown&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onBarMouseDown</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">sCanvas</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="p">{</span><span class="nx">component</span><span class="o">:</span> <span class="s1">&#39;s&#39;</span><span class="p">});</span>
+		<span class="nx">Y</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;mousedown&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onBarMouseDown</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">lCanvas</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="p">{</span><span class="nx">component</span><span class="o">:</span> <span class="s1">&#39;l&#39;</span><span class="p">});</span>
+		<span class="nx">Y</span><span class="p">.</span><span class="nx">delegate</span><span class="p">(</span><span class="s1">&#39;keyup&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onInputKeyUp</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">contentBox</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_VALUE</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+		<span class="nx">Y</span><span class="p">.</span><span class="nx">delegate</span><span class="p">(</span><span class="s1">&#39;blur&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onInputBlur</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">contentBox</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_VALUE</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+		<span class="nx">Y</span><span class="p">.</span><span class="nx">delegate</span><span class="p">(</span><span class="s1">&#39;keydown&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onInputKeyDown</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">contentBox</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="nx">ColorPicker</span><span class="p">.</span><span class="nx">CLASSNAME_VALUE</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+	<span class="p">},</span>
+	<span class="nx">syncUI</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">width</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;squareWidth&#39;</span><span class="p">),</span> <span class="nx">height</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;squareHeight&#39;</span><span class="p">);</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">squareX</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">h</span> <span class="o">*</span> <span class="p">(</span><span class="nx">width</span><span class="o">/</span><span class="mf">1.0</span><span class="p">);</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">squareY</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">color</span><span class="p">.</span><span class="nx">l</span> <span class="o">*</span> <span class="p">(</span><span class="nx">height</span><span class="o">/</span><span class="mf">1.0</span><span class="p">);</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">update</span><span class="p">();</span>
+	<span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">Y</span><span class="p">.</span><span class="nx">ColorPicker</span> <span class="o">=</span> <span class="nx">ColorPicker</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm">* ColorPalette provides a simple interface for storing and reusing selected colors. It can be coupled with the ColorPicker widget to provide</span>
+<span class="cm">* a simple history of selected colors.</span>
+<span class="cm">* </span>
+<span class="cm">* @namespace Y</span>
+<span class="cm">* @class ColorPalette</span>
+<span class="cm">*/</span>
+<span class="kd">function</span> <span class="nx">ColorPalette</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">ColorPalette</span><span class="p">.</span><span class="nx">superclass</span><span class="p">.</span><span class="nx">constructor</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+	
+	<span class="cm">/**</span>
+<span class="cm">	* An event fired when a color in the palette is clicked upon.</span>
+<span class="cm">	* @event palette:selected</span>
+<span class="cm">	* @param {Object} color An object containing the color in RGB and HSL format e.g. &lt;code&gt;&amp;#123; rgb: &amp;#123; r: 255, g: 0, b: 0 &amp;#125;, hsl: &amp;#123; h: 1.0, s: 0.5, l: 1.0 &amp;#125; &amp;#125;&lt;/code&gt;</span>
+<span class="cm">	*/</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">publish</span><span class="p">(</span><span class="s2">&quot;palette:selected&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">ColorPalette</span><span class="p">.</span><span class="nx">NAME</span> <span class="o">=</span> <span class="s1">&#39;colorPalette&#39;</span><span class="p">;</span>
+
+<span class="nx">ColorPalette</span><span class="p">.</span><span class="nx">CLASSNAME_SWATCH</span> <span class="o">=</span> <span class="s1">&#39;cp-swatch&#39;</span><span class="p">;</span>
+
+<span class="c1">// Configuration attributes</span>
+<span class="nx">ColorPalette</span><span class="p">.</span><span class="nx">ATTRS</span> <span class="o">=</span> <span class="p">{</span>
+<span class="p">};</span>
+
+<span class="nx">Y</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">ColorPalette</span><span class="p">,</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">Widget</span><span class="p">,</span> <span class="p">{</span>
+	<span class="cm">/**</span>
+<span class="cm">	* An array of colors stored in the palette</span>
+<span class="cm">	* @property colors</span>
+<span class="cm">	* @type Array</span>
+<span class="cm">	* @default []</span>
+<span class="cm">	*/</span>
+	<span class="nx">colors</span><span class="o">:</span> <span class="p">[],</span>
+	
+	<span class="cm">/**</span>
+<span class="cm">	* Returns true if the specified color (in HSL float object format) already exists in the palette</span>
+<span class="cm">	* @method colorExists</span>
+<span class="cm">	* @param color {Object} the color to test, in HSL float object format e.g. &lt;code&gt;&amp;#123; h: 1.0, s: 1.0, l: 0.5 &amp;#125;&lt;/code&gt;</span>
+<span class="cm">	* @return {Boolean} true if the color already exists in the palette</span>
+<span class="cm">	*/</span>
+	<span class="nx">colorExists</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">color</span><span class="p">)</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">c</span><span class="p">;</span>
+		<span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">colors</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">c</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">colors</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+			<span class="k">if</span> <span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">h</span> <span class="o">===</span> <span class="nx">color</span><span class="p">.</span><span class="nx">h</span> <span class="o">&amp;&amp;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">s</span> <span class="o">===</span> <span class="nx">color</span><span class="p">.</span><span class="nx">s</span> <span class="o">&amp;&amp;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">l</span> <span class="o">===</span> <span class="nx">color</span><span class="p">.</span><span class="nx">l</span><span class="p">)</span> <span class="p">{</span>
+				<span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+		<span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	* Adds the specified color to the palette if it doesn&#39;t already exist.</span>
+<span class="cm">	* @method addColor</span>
+<span class="cm">	* @param color {Object} the color to add, in HSL float object format e.g. &lt;code&gt;&amp;#123; h: 1.0, s: 1.0, l: 0.5 &amp;#125;&lt;/code&gt;</span>
+<span class="cm">	*/</span>
+	<span class="nx">addColor</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">color</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">colorExists</span><span class="p">(</span><span class="nx">color</span><span class="p">))</span> <span class="p">{</span>
+			<span class="c1">// swatch already exists, do nothing</span>
+			<span class="k">return</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="kd">var</span> <span class="nx">col</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">merge</span><span class="p">(</span><span class="nx">color</span><span class="p">),</span>
+			<span class="nx">div</span> <span class="o">=</span> <span class="nx">Y</span><span class="p">.</span><span class="nx">Node</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="s1">&#39;&lt;div class=&quot;&#39;</span> <span class="o">+</span> <span class="nx">ColorPalette</span><span class="p">.</span><span class="nx">CLASSNAME_SWATCH</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;&lt;/div&gt;&#39;</span><span class="p">),</span>
+			<span class="nx">rgb</span> <span class="o">=</span> <span class="nx">Colors</span><span class="p">.</span><span class="nx">hslToRGB</span><span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="nx">col</span><span class="p">.</span><span class="nx">s</span><span class="p">,</span> <span class="nx">col</span><span class="p">.</span><span class="nx">l</span><span class="p">),</span>
+			<span class="nx">contentBox</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;contentBox&#39;</span><span class="p">);</span>
+		<span class="nx">div</span><span class="p">.</span><span class="nx">setStyle</span><span class="p">(</span><span class="s1">&#39;background&#39;</span><span class="p">,</span> <span class="s1">&#39;rgb(&#39;</span> <span class="o">+</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">r</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">g</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span> <span class="nx">rgb</span><span class="p">.</span><span class="nx">b</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">);</span>
+		<span class="nx">div</span><span class="p">.</span><span class="nx">setData</span><span class="p">(</span><span class="s1">&#39;hsl&#39;</span><span class="p">,</span> <span class="nx">col</span><span class="p">);</span>
+		<span class="nx">contentBox</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">div</span><span class="p">);</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">colors</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">col</span><span class="p">);</span>
+	<span class="p">},</span>	
+	<span class="nx">renderUI</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+		
+	<span class="p">},</span>
+	<span class="nx">bindUI</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+		<span class="nx">Y</span><span class="p">.</span><span class="nx">delegate</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onSwatchClick</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;contentBox&#39;</span><span class="p">),</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="nx">ColorPalette</span><span class="p">.</span><span class="nx">CLASSNAME_SWATCH</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	* Handler for the moment when a swatch in the palette is clicked. This handler fires the &#39;palette:selected&#39; event.</span>
+<span class="cm">	* @method onSwatchClick</span>
+<span class="cm">	* @param {Object} ev the click event.</span>
+<span class="cm">	* @protected</span>
+<span class="cm">	*/</span>
+	<span class="nx">onSwatchClick</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ev</span><span class="p">)</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">swatch</span> <span class="o">=</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">target</span><span class="p">,</span>
+			<span class="nx">hsl</span> <span class="o">=</span> <span class="nx">swatch</span><span class="p">.</span><span class="nx">getData</span><span class="p">(</span><span class="s1">&#39;hsl&#39;</span><span class="p">),</span>
+			<span class="nx">rgb</span> <span class="o">=</span> <span class="nx">Colors</span><span class="p">.</span><span class="nx">hslToRGB</span><span class="p">(</span><span class="nx">hsl</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="nx">hsl</span><span class="p">.</span><span class="nx">s</span><span class="p">,</span> <span class="nx">hsl</span><span class="p">.</span><span class="nx">l</span><span class="p">);</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span><span class="s1">&#39;palette:selected&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">hsl</span><span class="o">:</span> <span class="nx">hsl</span><span class="p">,</span> <span class="nx">rgb</span><span class="o">:</span> <span class="nx">rgb</span><span class="p">});</span>
+	<span class="p">},</span>
+	<span class="nx">syncUI</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+	
+	<span class="p">}</span>
+<span class="p">});</span>
+<span class="nx">Y</span><span class="p">.</span><span class="nx">ColorPalette</span> <span class="o">=</span> <span class="nx">ColorPalette</span><span class="p">;</span>
+</pre></div>
+
+                    </div>
+			</div>
+		</div>
+		<div class="yui-b">
+            <div class="nav">
+
+                    <div id="moduleList" class="module">
+                        <h4>Modules</h4>
+                        <ul class="content">
+                                <li class="selected"><a href="module_gallery-colorpicker.html" title="gallery-colorpicker">gallery-colorpicker</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="classList" class="module">
+                        <h4>Classes</h4>
+                        <ul class="content">
+                                <li class=""><a href="Y.ColorPalette.html" title="Y.ColorPalette">Y.ColorPalette</a></li>
+                                <li class=""><a href="Y.ColorPicker.html" title="Y.ColorPicker">Y.ColorPicker</a></li>
+                                <li class=""><a href="Y.Colors.html" title="Y.Colors">Y.Colors</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="fileList" class="module">
+                        <h4>Files</h4>
+                        <ul class="content">        
+                                <li class="selected"><a href="colorpicker.js.html" title="colorpicker.js">colorpicker.js</a></li>
+                        </ul>
+                    </div>
+
+
+
+
+
+            </div>
+		</div>
+	</div>
+	<div id="ft">
+        <hr />
+        Copyright &copy; 2011 Yahoo! Inc. All rights reserved.
+	</div>
+</div>
+<script type="text/javascript">
+
+    var ALL_YUI_PROPS = [{"url": "Y.ColorPalette.html#method_addColor", "access": "", "host": "Y.ColorPalette", "type": "method", "name": "addColor"}, {"url": "Y.ColorPicker.html#config_barHeight", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "barHeight"}, {"url": "Y.ColorPicker.html#property_barPaddingX", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "barPaddingX"}, {"url": "Y.ColorPicker.html#property_barPaddingY", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "barPaddingY"}, {"url": "Y.ColorPicker.html#config_barWidth", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "barWidth"}, {"url": "Y.ColorPicker.html#config_cacheBars", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "cacheBars"}, {"url": "Y.ColorPicker.html#property_color", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "color"}, {"url": "Y.ColorPalette.html#method_colorExists", "access": "", "host": "Y.ColorPalette", "type": "method", "name": "colorExists"}, {"url": "Y.ColorPalette.html#property_colors", "access": "", "host": "Y.ColorPalette", "type": "property", "name": "colors"}, {"url": "Y.ColorPicker.html#config_hex", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "hex"}, {"url": "Y.ColorPicker.html#config_hsl", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "hsl"}, {"url": "Y.ColorPicker.html#config_hslInt", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "hslInt"}, {"url": "Y.Colors.html#method_hslToRGB", "access": "", "host": "Y.Colors", "type": "method", "name": "hslToRGB"}, {"url": "Y.Colors.html#method__hue2rgb", "access": "protected", "host": "Y.Colors", "type": "method", "name": "_hue2rgb"}, {"url": "Y.ColorPicker.html#property_lCachePixels", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "lCachePixels"}, {"url": "Y.ColorPalette.html#method_onSwatchClick", "access": "protected", "host": "Y.ColorPalette", "type": "method", "name": "onSwatchClick"}, {"url": "Y.ColorPalette.html#event_palette:selected", "access": "", "host": "Y.ColorPalette", "type": "event", "name": "palette:selected"}, {"url": "Y.ColorPicker.html#config_rgb", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "rgb"}, {"url": "Y.Colors.html#method_rgbToHSL", "access": "", "host": "Y.Colors", "type": "method", "name": "rgbToHSL"}, {"url": "Y.ColorPicker.html#property_sCachePixels", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "sCachePixels"}, {"url": "Y.ColorPicker.html#config_showHEX", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "showHEX"}, {"url": "Y.ColorPicker.html#config_showHSL", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "showHSL"}, {"url": "Y.ColorPicker.html#config_showHSLBars", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "showHSLBars"}, {"url": "Y.ColorPicker.html#config_showRGB", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "showRGB"}, {"url": "Y.ColorPicker.html#config_showSwatch", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "showSwatch"}, {"url": "Y.ColorPicker.html#property_squareCachePixels", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "squareCachePixels"}, {"url": "Y.ColorPicker.html#config_squareHeight", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "squareHeight"}, {"url": "Y.ColorPicker.html#config_squareWidth", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "squareWidth"}, {"url": "Y.ColorPicker.html#config_strings", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "strings"}, {"url": "Y.ColorPicker.html#config_swatchHeight", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "swatchHeight"}, {"url": "Y.ColorPicker.html#config_swatchWidth", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "swatchWidth"}];
+</script>
+</body>
+</html>

@@ -1,0 +1,569 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<title>API: gallery-colorpicker  Y.ColorPicker   (YUI Library)</title>
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
+    <script type="text/javascript" src="assets/api-js"></script>
+    <script type="text/javascript" src="assets/ac-js"></script>
+</head>
+
+<body id="yahoo-com">
+
+<div id="doc3" class="yui-t2">
+	<div id="hd">
+        <h1><a href="http://developer.yahoo.com/yui/" title="Yahoo! UI Library">Yahoo! UI Library</a></h1>
+        <h3>gallery-colorpicker&nbsp; <span class="subtitle">1.0.0</span></h3>
+        <a href="./index.html" title="Yahoo! UI Library">Yahoo! UI Library</a> 
+            &gt; <a href="./module_gallery-colorpicker.html" title="gallery-colorpicker">gallery-colorpicker</a>
+                 &gt; Y.ColorPicker 
+                
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
+	</div>
+
+	<div id="bd">
+		<div id="yui-main">
+			<div class="yui-b">
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
+            </form>
+
+                    <h2>
+                        
+
+                        
+                        
+                            Class <b property="yui:name">Y.ColorPicker</b>
+                        <span class="extends">
+                        </span>
+
+                    </h2>
+                    <!-- class tree goes here -->
+                    
+                
+  
+
+                    <div class="summary description" property="yui:description">
+                        ColorPicker is a widget that provides a HTML5 based canvas interface to selecting colors
+using the HSL format. It provides a thumb from which to select colors as well as sliders
+and text areas for manually entering values.
+You can retrieve the currently selected color through a variety of properties, allowing
+you to select colors in HSL, RGB and Hex formats.
+                    </div>
+
+                    
+                    <div rel="yui:properties" resource="#properties">
+                        <div class="section field details">
+                            <h3 id="properties">Properties</h3>
+                            <div class="content">
+                                    <div class="protected" rel="yui:property" resource="#property_barPaddingX">
+                                    <h4><a name="property_barPaddingX" property="yui:name">barPaddingX</a>
+                                        - <code>protected <span property="yui:type">Number</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Horizontal padding between color bars.
+                                        </div>
+                                    </div>
+     
+                                        
+                                    <div class="default" property="yui:defaultValue">
+                                        Default Value: 5
+                                    </div>        
+
+
+                                    <hr />
+                                    </div>
+                                    <div class="protected" rel="yui:property" resource="#property_barPaddingY">
+                                    <h4><a name="property_barPaddingY" property="yui:name">barPaddingY</a>
+                                        - <code>protected <span property="yui:type">Number</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Vertical padding between color bars.
+                                        </div>
+                                    </div>
+     
+                                        
+                                    <div class="default" property="yui:defaultValue">
+                                        Default Value: 5
+                                    </div>        
+
+
+                                    <hr />
+                                    </div>
+                                    <div class="protected" rel="yui:property" resource="#property_color">
+                                    <h4><a name="property_color" property="yui:name">color</a>
+                                        - <code>protected <span property="yui:type">Object</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            The current color selected by the picker in HSL object format.
+                                        </div>
+                                    </div>
+     
+                                        
+                                    <div class="default" property="yui:defaultValue">
+                                        Default Value: {h: 0, s: 1.0, l: 0.5}
+                                    </div>        
+
+
+                                    <hr />
+                                    </div>
+                                    <div class="protected" rel="yui:property" resource="#property_lCachePixels">
+                                    <h4><a name="property_lCachePixels" property="yui:name">lCachePixels</a>
+                                        - <code>protected <span property="yui:type">Object</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            An in-memory cache of the lightness bar images. Only used if cacheBars is enabled.
+                                        </div>
+                                    </div>
+     
+                                        
+
+
+                                    <hr />
+                                    </div>
+                                    <div class="protected" rel="yui:property" resource="#property_sCachePixels">
+                                    <h4><a name="property_sCachePixels" property="yui:name">sCachePixels</a>
+                                        - <code>protected <span property="yui:type">Object</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            An in-memory cache of the saturation bar images. Only used if cacheBars is enabled.
+                                        </div>
+                                    </div>
+     
+                                        
+
+
+                                    <hr />
+                                    </div>
+                                    <div class="protected" rel="yui:property" resource="#property_squareCachePixels">
+                                    <h4><a name="property_squareCachePixels" property="yui:name">squareCachePixels</a>
+                                        - <code>protected <span property="yui:type">Object</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            An in-memory cache of the color selector area. Only used if cacheBars is enabled.
+                                        </div>
+                                    </div>
+     
+                                        
+
+
+                                    <hr />
+                                    </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div rel="yui:methods" resource="#methods">
+
+                    </div>
+
+                    <div rel="yui:events" resource="#events">
+
+
+                    </div>
+
+                    <div rel="yui:attributes" resource="#configattributes">
+                        <div class="section field details">
+                            <h3 id="configattributes">Configuration Attributes</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:attribute" resource="#config_barHeight">
+                                    <h4><a name="config_barHeight">barHeight</a>
+                                        <code>- <span property="yui:type">Number</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            The height of the color bars in pixels
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: 150
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_barWidth">
+                                    <h4><a name="config_barWidth">barWidth</a>
+                                        <code>- <span property="yui:type">Number</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            The width of the color bars in pixels
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: 20
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_cacheBars">
+                                    <h4><a name="config_cacheBars">cacheBars</a>
+                                        <code>- <span property="yui:type">Boolean</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Controls if the color bars should be cached in memory. New color bars are generated as the Hue and Saturation values change,
+these generated images will be saved in memory if cacheBars is enabled. This may marginally increase performance at the
+cost of memory usage. Disabled by default.
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: false
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_hex">
+                                    <h4><a name="config_hex">hex</a>
+                                        <code>- <span property="yui:type">String</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Gets or sets the selected color of the picker using HEX notation, e.g. <code>FFFFFF</code>
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: 'FF0000'
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_hsl">
+                                    <h4><a name="config_hsl">hsl</a>
+                                        <code>- <span property="yui:type">Object</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Gets or sets the selected color of the picker using HSL floating point object notation, <code>{ h: 1.0, s: 0, l: 1.0 }</code>.
+All values are normalized in the range 0 - 1.
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: {h: 0, s: 1, l: 0.5}
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_hslInt">
+                                    <h4><a name="config_hslInt">hslInt</a>
+                                        <code>- <span property="yui:type">Object</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Gets or sets the selected color of the picker using HSL integer object notation, <code>{ h: 360, s: 0, l: 100 }</code>.
+Hue is represented in the range 0 - 360, saturation and lightness are in the range 0 - 100.
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: {h: 0, s: 100, l: 50}
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_rgb">
+                                    <h4><a name="config_rgb">rgb</a>
+                                        <code>- <span property="yui:type">Object</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Gets or sets the selected color of the picker using RGB object notation, <code>{ r: 255, g: 0, b: 255 }</code>
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: {r: 255, g: 0, b: 0}
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_showHEX">
+                                    <h4><a name="config_showHEX">showHEX</a>
+                                        <code>- <span property="yui:type">Boolean</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Controls visibility of the HEX text box.
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: true
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_showHSL">
+                                    <h4><a name="config_showHSL">showHSL</a>
+                                        <code>- <span property="yui:type">Boolean</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Controls visibility of the Hue, Saturation and Lightness text boxes, allowing manual selection of specific values.
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: true
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_showHSLBars">
+                                    <h4><a name="config_showHSLBars">showHSLBars</a>
+                                        <code>- <span property="yui:type">Boolean</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Controls visibility of the Hue, Saturation and Lightness color bars from which colors can be selected.
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: true
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_showRGB">
+                                    <h4><a name="config_showRGB">showRGB</a>
+                                        <code>- <span property="yui:type">Boolean</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Controls visibility of the Red, Green and Blue text boxes, allowing manual selection of specific values.
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: true
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_showSwatch">
+                                    <h4><a name="config_showSwatch">showSwatch</a>
+                                        <code>- <span property="yui:type">Boolean</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Controls visibility of the color swatch area which displays the current color.
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: true
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_squareHeight">
+                                    <h4><a name="config_squareHeight">squareHeight</a>
+                                        <code>- <span property="yui:type">Number</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            The height of the color selector area in pixels
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: 150
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_squareWidth">
+                                    <h4><a name="config_squareWidth">squareWidth</a>
+                                        <code>- <span property="yui:type">Number</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            The width of the color selector area in pixels
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: 150
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_strings">
+                                    <h4><a name="config_strings">strings</a>
+                                        <code>- <span property="yui:type">Object</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Sets the strings used for the labels on the text boxes, the available properties are <code>'hValue', 'sValue', 'lValue',
+'rValue', 'gValue', 'bValue', 'hexValue'</code>.
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: { hValue: 'H', sValue: 'S', lValue: 'L', rValue: 'R', gValue: 'G', bValue: 'B', hexValue: 'Hex' }
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_swatchHeight">
+                                    <h4><a name="config_swatchHeight">swatchHeight</a>
+                                        <code>- <span property="yui:type">Number</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            The height of the color swatch in pixels
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: 34
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_swatchWidth">
+                                    <h4><a name="config_swatchWidth">swatchWidth</a>
+                                        <code>- <span property="yui:type">Number</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            The width of the color swatch in pixels
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: 110
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+
+                            </div>
+                        </div>
+
+                    </div>
+
+			</div>
+		</div>
+		<div class="yui-b">
+            <div class="nav">
+
+                    <div id="moduleList" class="module">
+                        <h4>Modules</h4>
+                        <ul class="content">
+                                <li class="selected"><a href="module_gallery-colorpicker.html" title="gallery-colorpicker">gallery-colorpicker</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="classList" class="module">
+                        <h4>Classes</h4>
+                        <ul class="content">
+                                <li class=""><a href="Y.ColorPalette.html" title="Y.ColorPalette">Y.ColorPalette</a></li>
+                                <li class="selected"><a href="Y.ColorPicker.html" title="Y.ColorPicker">Y.ColorPicker</a></li>
+                                <li class=""><a href="Y.Colors.html" title="Y.Colors">Y.Colors</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="fileList" class="module">
+                        <h4>Files</h4>
+                        <ul class="content">        
+                                <li class=""><a href="colorpicker.js.html" title="colorpicker.js">colorpicker.js</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="propertyList" class="module">
+                        <h4>Properties</h4>
+                        <ul class="content">        
+                                <li class="protected"><a href="#property_barPaddingX" title="barPaddingX">barPaddingX</a></li>
+                                <li class="protected"><a href="#property_barPaddingY" title="barPaddingY">barPaddingY</a></li>
+                                <li class="protected"><a href="#property_color" title="color">color</a></li>
+                                <li class="protected"><a href="#property_lCachePixels" title="lCachePixels">lCachePixels</a></li>
+                                <li class="protected"><a href="#property_sCachePixels" title="sCachePixels">sCachePixels</a></li>
+                                <li class="protected"><a href="#property_squareCachePixels" title="squareCachePixels">squareCachePixels</a></li>
+                        </ul>
+                    </div>
+
+
+
+                    <div id="configList" class="module">
+                        <h4>Configuration Attributes</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#config_barHeight" title="barHeight">barHeight</a></li>
+                                <li class=""><a href="#config_barWidth" title="barWidth">barWidth</a></li>
+                                <li class=""><a href="#config_cacheBars" title="cacheBars">cacheBars</a></li>
+                                <li class=""><a href="#config_hex" title="hex">hex</a></li>
+                                <li class=""><a href="#config_hsl" title="hsl">hsl</a></li>
+                                <li class=""><a href="#config_hslInt" title="hslInt">hslInt</a></li>
+                                <li class=""><a href="#config_rgb" title="rgb">rgb</a></li>
+                                <li class=""><a href="#config_showHEX" title="showHEX">showHEX</a></li>
+                                <li class=""><a href="#config_showHSL" title="showHSL">showHSL</a></li>
+                                <li class=""><a href="#config_showHSLBars" title="showHSLBars">showHSLBars</a></li>
+                                <li class=""><a href="#config_showRGB" title="showRGB">showRGB</a></li>
+                                <li class=""><a href="#config_showSwatch" title="showSwatch">showSwatch</a></li>
+                                <li class=""><a href="#config_squareHeight" title="squareHeight">squareHeight</a></li>
+                                <li class=""><a href="#config_squareWidth" title="squareWidth">squareWidth</a></li>
+                                <li class=""><a href="#config_strings" title="strings">strings</a></li>
+                                <li class=""><a href="#config_swatchHeight" title="swatchHeight">swatchHeight</a></li>
+                                <li class=""><a href="#config_swatchWidth" title="swatchWidth">swatchWidth</a></li>
+                        </ul>
+                    </div>
+
+            </div>
+		</div>
+	</div>
+	<div id="ft">
+        <hr />
+        Copyright &copy; 2011 Yahoo! Inc. All rights reserved.
+	</div>
+</div>
+<script type="text/javascript">
+
+    var ALL_YUI_PROPS = [{"url": "Y.ColorPicker.html#config_barHeight", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "barHeight"}, {"url": "Y.ColorPicker.html#property_barPaddingX", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "barPaddingX"}, {"url": "Y.ColorPicker.html#property_barPaddingY", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "barPaddingY"}, {"url": "Y.ColorPicker.html#config_barWidth", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "barWidth"}, {"url": "Y.ColorPicker.html#config_cacheBars", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "cacheBars"}, {"url": "Y.ColorPicker.html#property_color", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "color"}, {"url": "Y.ColorPicker.html#config_hex", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "hex"}, {"url": "Y.ColorPicker.html#config_hsl", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "hsl"}, {"url": "Y.ColorPicker.html#config_hslInt", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "hslInt"}, {"url": "Y.Colors.html#method_hslToRGB", "access": "", "host": "Y.Colors", "type": "method", "name": "hslToRGB"}, {"url": "Y.Colors.html#method__hue2rgb", "access": "protected", "host": "Y.Colors", "type": "method", "name": "_hue2rgb"}, {"url": "Y.ColorPicker.html#property_lCachePixels", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "lCachePixels"}, {"url": "Y.ColorPicker.html#config_rgb", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "rgb"}, {"url": "Y.Colors.html#method_rgbToHSL", "access": "", "host": "Y.Colors", "type": "method", "name": "rgbToHSL"}, {"url": "Y.ColorPicker.html#property_sCachePixels", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "sCachePixels"}, {"url": "Y.ColorPicker.html#config_showHEX", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "showHEX"}, {"url": "Y.ColorPicker.html#config_showHSL", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "showHSL"}, {"url": "Y.ColorPicker.html#config_showHSLBars", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "showHSLBars"}, {"url": "Y.ColorPicker.html#config_showRGB", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "showRGB"}, {"url": "Y.ColorPicker.html#config_showSwatch", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "showSwatch"}, {"url": "Y.ColorPicker.html#property_squareCachePixels", "access": "protected", "host": "Y.ColorPicker", "type": "property", "name": "squareCachePixels"}, {"url": "Y.ColorPicker.html#config_squareHeight", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "squareHeight"}, {"url": "Y.ColorPicker.html#config_squareWidth", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "squareWidth"}, {"url": "Y.ColorPicker.html#config_strings", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "strings"}, {"url": "Y.ColorPicker.html#config_swatchHeight", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "swatchHeight"}, {"url": "Y.ColorPicker.html#config_swatchWidth", "access": "", "host": "Y.ColorPicker", "type": "config", "name": "swatchWidth"}];
+</script>
+</body>
+</html>
