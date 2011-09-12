@@ -1,8 +1,10 @@
 /**
 * <p>The Color Picker Widget provides a HTML5 based UI for selecting a color
-* from the HSL color space. It uses the Canvas element to render the dynamic
-* color sliders, as such it requires HTML5 support, so Internet Explorer
-* versions prior to version 9 will not work with this widget.</p>
+* from the HSL color space.</p>
+* 
+* <p><strong>Note:</strong> ColorPicker uses the Canvas element to render the dynamic
+* color sliders, as such it <strong>requires HTML5 support</strong>, so <em>Internet Explorer
+* versions prior to version 9 will not work with this widget</em>.</p>
 *
 * <p> To use the Color Picker Widget, simply add a reference to it in your
 * <code>use()</code> statement, and then instantiate an instance of the widget
@@ -11,26 +13,47 @@
 * <p>
 * <code>
 * &#60;script type="text/javascript"&#63;<br/>
-* <br/>
 *	// Call the 'use' method passing in "gallery-colorpicker". This will load<br/>
 *	// the script and CSS for the Color Picker Widget and all of the required<br/>
 *	// dependencies
 * <br>
 *	YUI().use("gallery-colorpicker", function (Y) { <br/>
-*		// create an instance of the widget
-*		var colorpicker = new Y.ColorPicker();
-*		// render the widget into the #picker node
-*		colorpicker.render("#picker");
-*		Y.on('#getcolorbutton',function(ev) {
-*			ev.halt();
-*			var hex = colorpicker.get('hex');
-*			// do something with the hex value....
-*		});
+*		// create an instance of the widget <br/>
+*		var colorpicker = new Y.ColorPicker(); <br/>
+*		// render the widget into the #picker node<br/>
+*		colorpicker.render("#picker");<br/>
+*		Y.on('#getcolorbutton',function(ev) {<br/>
+*			ev.halt();<br/>
+*			var hex = colorpicker.get('hex');<br/>
+*			// do something with the hex value....<br/>
+*		});<br/>
 *	}
 * </code>
 * </p>
+* @module gallery-colorpicker
+* @requires node, event, widget, classnamemanager
+*/
+
+/**
+* The Colors class provides simple color conversion functionality. It currently
+* supports HSL to RGB conversions and vice versa. The conversion methods are
+* used directly, e.g. <a href="Y.Colors.html#method_hslToRGB"><code>
+* Y.Colors.hslToRGB(1.0,1.0,1.0);</code></a>
+* @namespace Y
+* @class Colors
 */
 var Colors = {
+	/**
+	* Converts RGB values in the range 0-255 to HSL format in the range 0-1.
+	* @method rgbToHSL
+	* @param {Number} r red component of the color in the range 0-255
+	* @param {Number} g green component of the color in the range 0-255
+	* @param {Number} b blue component of the color in the range 0-255
+	* @public
+	* @return {object} the color in HSL format, returned as an object of the
+	* form <code>&#123; h: 1.0, s: 0.5, l: 0.5 &#125;</code>. The HSL values are normalised in the
+	* range 0-1.
+	*/
 	rgbToHSL: function (r, g, b) {
 		r /= 255; g /= 255; b /= 255;
 		var max = Math.max(r, g, b), min = Math.min(r, g, b),
@@ -51,7 +74,12 @@ var Colors = {
 
 		return {h: h, s: s, l: l};
 	},
-	hue2rgb: function (p, q, t) {
+	/**
+	* Internal method used for converting for HSL to RGB.
+	* @method _hue2rgb
+	* @protected
+	*/
+	_hue2rgb: function (p, q, t) {
 		if (t < 0) { t += 1; }
 		if (t > 1) { t -= 1; }
 		if (t < 1 / 6) { return p + (q - p) * 6 * t; }
@@ -59,6 +87,18 @@ var Colors = {
 		if (t < 2 / 3) { return p + (q - p) * (2 / 3 - t) * 6; }
 		return p;
 	},
+	
+	/**
+	* Converts HSL values in the range 0-1 to RGB format in the range 0-255.
+	* @method hslToRGB
+	* @param {Number} h hue component of the color in the range 0-1
+	* @param {Number} s saturation component of the color in the range 0-1
+	* @param {Number} l lightness component of the color in the range 0-1
+	* @public
+	* @return {object} the color in RGB format, returned as an object of the
+	* form <code>&#123; r: 255, g: 0, b: 0 &#125;</code>. The RGB values are normalised in the
+	* range 0-255.
+	*/
 	hslToRGB: function (h, s, l) {
 		var r, g, b, q, p;
 		if (s === 0) {
@@ -67,9 +107,9 @@ var Colors = {
 
 			q = l < 0.5 ? l * (1 + s) : l + s - l * s;
 			p = 2 * l - q;
-			r = Colors.hue2rgb(p, q, h + 1 / 3);
-			g = Colors.hue2rgb(p, q, h);
-			b = Colors.hue2rgb(p, q, h - 1 / 3);
+			r = Colors._hue2rgb(p, q, h + 1 / 3);
+			g = Colors._hue2rgb(p, q, h);
+			b = Colors._hue2rgb(p, q, h - 1 / 3);
 		}
 
 		return {r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255)};
@@ -77,6 +117,17 @@ var Colors = {
 };
 Y.Colors = Colors;
 
+/**
+* ColorPicker is a widget that provides a HTML5 based canvas interface to selecting colors
+* using the HSL format. It provides a thumb from which to select colors as well as sliders
+* and text areas for manually entering values.
+* 
+* You can retrieve the currently selected color through a variety of properties, allowing
+* you to select colors in HSL, RGB and Hex formats.
+*
+* @namespace Y
+* @class ColorPicker
+*/
 function ColorPicker() {
 	ColorPicker.superclass.constructor.apply(this, arguments);
 }
@@ -99,41 +150,115 @@ ColorPicker.CLASSNAME_HEXVALUE = Y.ClassNameManager.getClassName(ColorPicker.NAM
 
 // Configuration attributes
 ColorPicker.ATTRS = {
+	/**
+	* Controls visibility of the Hue, Saturation and Lightness color bars from which colors can be selected.
+	* @config showHSLBars
+	* @type Boolean
+	* @default true
+	*/
 	showHSLBars: {
 		value: true
 	},
+	/**
+	* Controls visibility of the Hue, Saturation and Lightness text boxes, allowing manual selection of specific values.
+	* @config showHSL
+	* @type Boolean
+	* @default true
+	*/
 	showHSL: {	
 		value: true
 	},
+	/**
+	* Controls visibility of the Red, Green and Blue text boxes, allowing manual selection of specific values.
+	* @config showRGB
+	* @type Boolean
+	* @default true
+	*/
 	showRGB: {
 		value: true
 	},
+	/**
+	* Controls visibility of the HEX text box.
+	* @config showHEX
+	* @type Boolean
+	* @default true
+	*/
 	showHEX: {
 		value: true
 	},
+	/**
+	* Controls visibility of the color swatch area which displays the current color.
+	* @config showSwatch
+	* @type Boolean
+	* @default true
+	*/
 	showSwatch: {
 		value: true
 	},
-	// size of the colour square
+	/**
+	* The width of the color selector area in pixels
+	* @config squareWidth
+	* @type Number
+	* @default 150
+	*/
 	squareWidth: {
 		value: 150
 	},
+	/**
+	* The height of the color selector area in pixels
+	* @config squareHeight
+	* @type Number
+	* @default 150
+	*/
 	squareHeight: {
 		value: 150
 	},
+	
+	/**
+	* The width of the color bars in pixels
+	* @config barWidth
+	* @type Number
+	* @default 20
+	*/
 	barWidth: {
 		value: 20
 	},
+	/**
+	* The height of the color bars in pixels
+	* @config barHeight
+	* @type Number
+	* @default 150
+	*/
 	barHeight: {
 		value: 150
 	},
+	
+	/**
+	* The width of the color swatch in pixels
+	* @config swatchWidth
+	* @type Number
+	* @default 110
+	*/
 	swatchWidth: {
 		value: 110
 	},
+	
+	/**
+	* The height of the color swatch in pixels
+	* @config swatchHeight
+	* @type Number
+	* @default 34
+	*/
 	swatchHeight: {
 		value: 34
 	},
-	// colour accessors
+	
+	/**
+	* Gets or sets the selected color of the picker using HEX notation, e.g. <code>FFFFFF</code>
+	* @config hex
+	* @type String
+	* @default 'FF0000'
+	*/
 	hex: {
 		getter: function () {
 			var rgb = this.get('rgb'),
@@ -165,6 +290,12 @@ ColorPicker.ATTRS = {
 			this.set('rgb', {r: r, g: g, b: b});
 		}
 	},
+	/**
+	* Gets or sets the selected color of the picker using RGB object notation, <code>{ r: 255, g: 0, b: 255 }</code>
+	* @config rgb
+	* @type Object
+	* @default {r: 255, g: 0, b: 0}
+	*/
 	rgb: {
 		getter: function () { return Colors.hslToRGB(this.color.h, this.color.s, this.color.l); },
 		setter: function (val) {
@@ -181,6 +312,13 @@ ColorPicker.ATTRS = {
 			this.update();
 		}
 	},
+	/**
+	* Gets or sets the selected color of the picker using HSL integer object notation, <code>{ h: 360, s: 0, l: 100 }</code>.
+	* Hue is represented in the range 0 - 360, saturation and lightness are in the range 0 - 100.
+	* @config hslInt
+	* @type Object
+	* @default {h: 0, s: 100, l: 50}
+	*/
 	hslInt: {
 		getter: function () {
 			var hsl = Y.merge(this.color);
@@ -204,6 +342,13 @@ ColorPicker.ATTRS = {
 			this.update();
 		}
 	},
+	/**
+	* Gets or sets the selected color of the picker using HSL floating point object notation, <code>{ h: 1.0, s: 0, l: 1.0 }</code>.
+	* All values are normalized in the range 0 - 1.
+	* @config hsl
+	* @type Object
+	* @default {h: 0, s: 1, l: 0.5}
+	*/
 	hsl: {
 		getter: function () { return this.color; },
 		setter: function (val) {
@@ -217,9 +362,24 @@ ColorPicker.ATTRS = {
 			this.update();
 		}
 	},
+	/**
+	* Controls if the color bars should be cached in memory. New color bars are generated as the Hue and Saturation values change,
+	* these generated images will be saved in memory if cacheBars is enabled. This may marginally increase performance at the
+	* cost of memory usage. Disabled by default.
+	* @config cacheBars
+	* @type Boolean
+	* @default false
+	*/
 	cacheBars: {
 		value: false
 	},
+	/**
+	* Sets the strings used for the labels on the text boxes, the available properties are <code>'hValue', 'sValue', 'lValue',
+	* 'rValue', 'gValue', 'bValue', 'hexValue'</code>.
+	* @config strings
+	* @type Object
+	* @default { hValue: 'H', sValue: 'S', lValue: 'L', rValue: 'R', gValue: 'G', bValue: 'B', hexValue: 'Hex' }
+	*/
 	strings: {
 		value: {
 			hValue: 'H',
@@ -234,11 +394,55 @@ ColorPicker.ATTRS = {
 };
 
 Y.extend(ColorPicker, Y.Widget, {
+	/**
+	* The current color selected by the picker in HSL object format.
+	* @property color
+	* @protected
+	* @type Object
+	* @default {h: 0, s: 1.0, l: 0.5}
+	*/
 	color: {h: 0, s: 1.0, l: 0.5},
+	
+	/**
+	* An in-memory cache of the saturation bar images. Only used if cacheBars is enabled.
+	* @property sCachePixels
+	* @protected
+	* @type Object
+	*/
 	sCachePixels: {},
+	
+	/**
+	* An in-memory cache of the lightness bar images. Only used if cacheBars is enabled.
+	* @property lCachePixels
+	* @protected
+	* @type Object
+	*/
 	lCachePixels: {},
+	
+	/**
+	* An in-memory cache of the color selector area. Only used if cacheBars is enabled.
+	* @property squareCachePixels
+	* @protected
+	* @type Object
+	*/
 	squareCachePixels: {},
+	
+	/**
+	* Horizontal padding between color bars.
+	* @property barPaddingX
+	* @protected
+	* @type Number
+	* @default 5
+	*/
 	barPaddingX: 5,
+	
+	/**
+	* Vertical padding between color bars.
+	* @property barPaddingY
+	* @protected
+	* @type Number
+	* @default 5
+	*/
 	barPaddingY: 5,
 	
 	renderUI: function () {
@@ -675,9 +879,21 @@ Y.extend(ColorPicker, Y.Widget, {
 
 Y.ColorPicker = ColorPicker;
 
-
+/**
+* ColorPalette provides a simple interface for storing and reusing selected colors. It can be coupled with the ColorPicker widget to provide
+* a simple history of selected colors.
+* 
+* @namespace Y
+* @class ColorPalette
+*/
 function ColorPalette() {
 	ColorPalette.superclass.constructor.apply(this, arguments);
+	
+	/**
+	* An event fired when a color in the palette is clicked upon.
+	* @event palette:selected
+	* @param {Object} color An object containing the color in RGB and HSL format e.g. <code>&#123; rgb: &#123; r: 255, g: 0, b: 0 &#125;, hsl: &#123; h: 1.0, s: 0.5, l: 1.0 &#125; &#125;</code>
+	*/
 	this.publish("palette:selected");
 }
 
@@ -690,8 +906,20 @@ ColorPalette.ATTRS = {
 };
 
 Y.extend(ColorPalette, Y.Widget, {
+	/**
+	* An array of colors stored in the palette
+	* @property colors
+	* @type Array
+	* @default []
+	*/
 	colors: [],
 	
+	/**
+	* Returns true if the specified color (in HSL float object format) already exists in the palette
+	* @method colorExists
+	* @param color {Object} the color to test, in HSL float object format e.g. <code>&#123; h: 1.0, s: 1.0, l: 0.5 &#125;</code>
+	* @return {Boolean} true if the color already exists in the palette
+	*/
 	colorExists: function (color) {
 		var i, c;
 		for (i = 0; i < this.colors.length; i += 1) {
@@ -702,6 +930,11 @@ Y.extend(ColorPalette, Y.Widget, {
 		}
 		return false;
 	},
+	/**
+	* Adds the specified color to the palette if it doesn't already exist.
+	* @method addColor
+	* @param color {Object} the color to add, in HSL float object format e.g. <code>&#123; h: 1.0, s: 1.0, l: 0.5 &#125;</code>
+	*/
 	addColor: function (color) {
 		if (this.colorExists(color)) {
 			// swatch already exists, do nothing
@@ -722,6 +955,12 @@ Y.extend(ColorPalette, Y.Widget, {
 	bindUI: function () {
 		Y.delegate('click', this.onSwatchClick, this.get('contentBox'), '.' + ColorPalette.CLASSNAME_SWATCH, this);
 	},
+	/**
+	* Handler for the moment when a swatch in the palette is clicked. This handler fires the 'palette:selected' event.
+	* @method onSwatchClick
+	* @param {Object} ev the click event.
+	* @protected
+	*/
 	onSwatchClick: function (ev) {
 		var swatch = ev.target,
 			hsl = swatch.getData('hsl'),
