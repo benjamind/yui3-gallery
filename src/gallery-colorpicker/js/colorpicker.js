@@ -766,11 +766,13 @@ Y.extend(ColorPicker, Y.Widget, {
 			}
 		}
 		this.renderSquare();
-		this.updateColor();
 		this.updateValues();
-		this.drawThumb(this.hCanvas, 'h', {h: this.color.h, s: 1.0, l: 0.5}, barWidth, barHeight, 1.0, false);
-		this.drawThumb(this.sCanvas, 's', {h: this.color.h, s: 1.0, l: this.color.l}, barWidth, barHeight, 1.0, true);
-		this.drawThumb(this.lCanvas, 'l', {h: this.color.h, s: this.color.s, l: 0.5}, barWidth, barHeight, 1.0, true);
+		if (this.get('showHSLBars')) {
+			this.updateColor();
+			this.drawThumb(this.hCanvas, 'h', {h: this.color.h, s: 1.0, l: 0.5}, barWidth, barHeight, 1.0, false);
+			this.drawThumb(this.sCanvas, 's', {h: this.color.h, s: 1.0, l: this.color.l}, barWidth, barHeight, 1.0, true);
+			this.drawThumb(this.lCanvas, 'l', {h: this.color.h, s: this.color.s, l: 0.5}, barWidth, barHeight, 1.0, true);
+		}
 	},
 	renderSquare: function () {
 		var width = this.get('squareWidth'), height = this.get('squareHeight'),
@@ -873,9 +875,11 @@ Y.extend(ColorPicker, Y.Widget, {
 	},
 	bindUI: function () {
 		Y.on('mousedown', this.onSquareMouseDown, this.squareCanvas, this);
-		Y.on('mousedown', this.onBarMouseDown, this.hCanvas, this, {component: 'h'});
-		Y.on('mousedown', this.onBarMouseDown, this.sCanvas, this, {component: 's'});
-		Y.on('mousedown', this.onBarMouseDown, this.lCanvas, this, {component: 'l'});
+		if (this.get('showHSLBars')) {
+			Y.on('mousedown', this.onBarMouseDown, this.hCanvas, this, {component: 'h'});
+			Y.on('mousedown', this.onBarMouseDown, this.sCanvas, this, {component: 's'});
+			Y.on('mousedown', this.onBarMouseDown, this.lCanvas, this, {component: 'l'});
+		}
 		Y.delegate('keyup', this.onInputKeyUp, this.contentBox, '.' + ColorPicker.CLASSNAME_VALUE, this);
 		Y.delegate('blur', this.onInputBlur, this.contentBox, '.' + ColorPicker.CLASSNAME_VALUE, this);
 		Y.delegate('keydown', this.onInputKeyDown, this.contentBox, '.' + ColorPicker.CLASSNAME_VALUE, this);
