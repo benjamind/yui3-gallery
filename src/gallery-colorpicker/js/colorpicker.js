@@ -551,9 +551,11 @@ Y.extend(ColorPicker, Y.Widget, {
 		this.trackBar = args.component;
 		this.trackBarCanvas = ev.target;
 		var offXY = ev.target.getXY(),
+			scrollX = ev.target.get('docScrollX'),
+			scrollY = ev.target.get('docScrollY'),
 			// get position within the square
-			x = ev.clientX - offXY[0],
-			y = ev.clientY - offXY[1];
+			x = ev.clientX + scrollX - offXY[0],
+			y = ev.clientY + scrollY - offXY[1];
 			
 		this.barX = x;
 		this.barY = y;
@@ -571,13 +573,18 @@ Y.extend(ColorPicker, Y.Widget, {
 			x,
 			y,
 			width,
-			height;
+			height,
+			scrollX,
+			scrollY;
 			
 		if (this.trackSquare) {
-			offXY = Y.Node.one(this.squareCanvas).getXY();
+			var c = Y.Node.one(this.squareCanvas);
+			offXY = c.getXY();
+			scrollX = c.get('docScrollX');
+			scrollY = c.get('docScrollY');
 			// get position within the square
-			x = ev.clientX - offXY[0];
-			y = ev.clientY - offXY[1];
+			x = ev.clientX + scrollX - offXY[0];
+			y = ev.clientY + scrollY - offXY[1];
 			width = this.get('squareWidth');
 			height = this.get('squareHeight');
 				
@@ -590,9 +597,11 @@ Y.extend(ColorPicker, Y.Widget, {
 		}
 		if (this.trackBar) {
 			offXY = this.trackBarCanvas.getXY();
+			scrollX = this.trackBarCanvas.get('docScrollX');
+			scrollY = this.trackBarCanvas.get('docScrollY');
 			// get position within the square
-			x = -this.barPaddingX + ev.clientX - offXY[0];
-			y = -this.barPaddingY + ev.clientY - offXY[1];
+			x = -this.barPaddingX + ev.clientX + scrollX - offXY[0];
+			y = -this.barPaddingY + ev.clientY + scrollY - offXY[1];
 			width = this.get('barWidth');
 			height = this.get('barHeight');
 				
@@ -609,9 +618,11 @@ Y.extend(ColorPicker, Y.Widget, {
 		// mousedown inside square, start tracking position
 		this.trackSquare = true;
 		var offXY = ev.target.getXY(),
+			scrollX = ev.target.get('docScrollX');
+			scrollY = ev.target.get('docScrollY');
 			// get position within the square
-			x = ev.clientX - offXY[0],
-			y = ev.clientY - offXY[1];
+			x = ev.clientX + scrollX - offXY[0],
+			y = ev.clientY + scrollY - offXY[1];
 			
 		this.squareX = x;
 		this.squareY = y;
