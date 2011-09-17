@@ -575,10 +575,11 @@ Y.extend(ColorPicker, Y.Widget, {
 			width,
 			height,
 			scrollX,
-			scrollY;
+			scrollY,
+			c;
 			
 		if (this.trackSquare) {
-			var c = Y.Node.one(this.squareCanvas);
+			c = Y.Node.one(this.squareCanvas);
 			offXY = c.getXY();
 			scrollX = c.get('docScrollX');
 			scrollY = c.get('docScrollY');
@@ -618,8 +619,8 @@ Y.extend(ColorPicker, Y.Widget, {
 		// mousedown inside square, start tracking position
 		this.trackSquare = true;
 		var offXY = ev.target.getXY(),
-			scrollX = ev.target.get('docScrollX');
-			scrollY = ev.target.get('docScrollY');
+			scrollX = ev.target.get('docScrollX'),
+			scrollY = ev.target.get('docScrollY'),
 			// get position within the square
 			x = ev.clientX + scrollX - offXY[0],
 			y = ev.clientY + scrollY - offXY[1];
@@ -630,6 +631,9 @@ Y.extend(ColorPicker, Y.Widget, {
 		ev.halt();
 	},
 	updateColor: function () {
+		if (!this.get('showHSLBars')) {
+			return;
+		}
 		var barWidth = this.get('barWidth'),
 			barHeight = this.get('barHeight'),
 			cacheBars = this.get('cacheBars'),
