@@ -1,28 +1,32 @@
 {
-    "name": "yui3-gallery",
-    "version": "2011.01.12",
-    "description": "YUI 3 Gallery",
+    "name": "yui",
+    "version": "3.6.0pre",
+    "description": "YUI 3 Source",
     "author": "Dav Glass <davglass@gmail.com>",
-    "bugs": { "web" : "http://yuilibrary.com/projects/yuilibrary" },
-    "os": ["darwin", "linux"],
+    "bugs": { "url" : "http://yuilibrary.com/projects/yui3/" },
     "engines": {
-        "node" : ">=0.2.0"
+        "node" : ">=0.4.0"
     },
     "directories": {
         "lib" : "."
     },
-    "main": "./gallery.js",
+    "main": "./index.js",
     "dependencies": {
-        "yui3": ">=0.5.8"
+        "request": "2.9.202"
+    },
+    "devDependencies": {
+        "yuidocjs": "*",
+        "shifter": "*",
+        "yogi": "*"
     },
     "licenses":[
         {
             "type" : "BSD",
-            "url" : "http://developer.yahoo.com/yui/license.html"
+            "url" : "http://yuilibrary.com/license/"
         }
     ],
     "repository": {
         "type":"git",
-        "url":"http://github.com/yui/yui3-gallery.git"
+        "url":"http://github.com/yui/yui3.git"
     }
 }
